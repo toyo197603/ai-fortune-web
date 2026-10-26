@@ -2,6 +2,66 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+<style>
+/* 天命の導き・天空デザイン */
+body {
+  background:
+    radial-gradient(ellipse at 50% 0%,
+      rgba(218,170,89,.24),transparent 34%),
+    radial-gradient(ellipse at 90% 55%,
+      rgba(99,67,153,.28),transparent 55%),
+    linear-gradient(160deg,#0b0a1b,#201635 75%,#100e23);
+  background-attachment:fixed;
+}
+main {position:relative;z-index:1}
+main::before {
+  content:"✦";
+  display:block;
+  text-align:center;
+  color:#f6d58e;
+  font-size:52px;
+  text-shadow:0 0 22px #e9ae55,0 0 55px #e9ae55;
+  margin-bottom:12px;
+}
+h1 {
+  color:#f6d58e!important;
+  text-shadow:0 0 12px #d7a557,0 0 32px #9b713a!important;
+}
+input,textarea {
+  border:1px solid #c9a05d!important;
+  border-radius:12px!important;
+}
+#birthWheelPanel {
+  background:
+    radial-gradient(ellipse at 50% 0%,
+      rgba(215,166,81,.19),transparent 65%),
+    #211832!important;
+  border-top:1px solid #d8ae65;
+  box-shadow:0 -12px 55px #d5a25733;
+}
+#birthWheelPanel h3 {
+  color:#f4d38a!important;
+  font-size:25px;
+  text-shadow:0 0 20px #dba85788;
+}
+.birthWheelCols {
+  border-top:1px solid #b68b4d66;
+  border-bottom:1px solid #b68b4d66;
+  border-radius:16px;
+  background:linear-gradient(90deg,
+    #18122b,#29203c,#18122b);
+}
+.birthWheelItem.selected {
+  color:#ffe09a!important;
+  text-shadow:0 0 15px #e9ad58;
+}
+#birthWheelDone {
+  background:linear-gradient(110deg,
+    #c99b50,#ffe3a1,#c99b50)!important;
+  box-shadow:0 0 24px #d5a25777;
+  color:#26182f!important;
+}
+</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>天命の導き｜運命鑑定</title>
