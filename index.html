@@ -104,7 +104,7 @@ plan:"free"
 });
 if(!response.ok)throw Error("HTTP "+response.status);
 const data=await response.json();
-result.textContent=data.fortune||"鑑定結果を取得できませんでした。";
+result.textContent=(data.fortune||"鑑定結果を取得できませんでした").split(/【さらに深く知りたいあなたへ】|【もっと深く知りたいあなたへ】/)[0].trim();
 document.getElementById("premium").style.display = data.fortune ? "block" : "none";
 }catch(err){
 result.textContent="通信エラーが発生しました。APIの設定を確認してください。";
