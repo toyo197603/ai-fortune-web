@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI運命鑑定</title>
+<style>
+body{margin:0;background:#101025;color:white;font-family:sans-serif;padding:24px}
+main{max-width:480px;margin:40px auto}
+h1{text-align:center;color:#eac783}
+p{text-align:center;color:#c9c4da}
+label{display:block;margin-top:20px}
+input,textarea{box-sizing:border-box;width:100%;padding:15px;margin-top:8px;border:1px solid #78669b;border-radius:10px;font-size:16px}
+textarea{height:110px}
+button{width:100%;padding:17px;margin-top:25px;background:#eac783;border:0;border-radius:12px;font-size:18px;font-weight:bold}
+#result{white-space:pre-wrap;line-height:1.9;margin-top:28px}
+</style>
+</head>
+<body>
+<main>
+<h1>✦ AI運命鑑定 ✦</h1>
+<p>あなたの未来に、光を。</p>
+<form id="form">
+<label>お名前<input id="name" required></label>
+<label>生年月日<input id="birthday" type="date" required></label>
+<label>相談したいこと<textarea id="question" required></textarea></label>
+<button id="submit">運命を鑑定する</button>
+</form>
+<div id="result" aria-live="polite"></div>
+</main>
+<script>
+const API="https://ai-fortune-api.karen-nayuta-kanata.workers.dev/fortune";
+document.getElementById("form").addEventListener("submit",async e=>{
+e.preventDefault();
+const btn=document.getElementById("submit");
+const result=document.getElementById("result");
+btn.disabled=true;
+result.textContent="鑑定中です...";
+try{
+const response=await fetch(API,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name:document.getElementById("name").value,
+birthday:document.getElementById("birthday").value,
+question:document.getElementById("question").value
+})
+});
+if(!response.ok)throw Error("HTTP "+response.status);
+const data=await response.json();
+result.textContent=data.fortune||"鑑定結果を取得できませんでした。";
+}catch(err){
+result.textContent="通信エラーが発生しました。APIの設定を確認してください。";
+}finally{
+btn.disabled=false;
+}
+});
+</script>
+</body>
+</html>
