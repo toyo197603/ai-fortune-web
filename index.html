@@ -69,6 +69,19 @@ input, textarea {
 <button id="submit">運命を鑑定する</button>
 </form>
 <div id="result" aria-live="polite"></div>
+
+<div id="premium" style="display:none;margin-top:30px;padding:25px 18px;border:1px solid #eac783;border-radius:18px;background:#211b35;text-align:center;">
+  <h2 style="color:#eac783;">✦ 本格AI運命鑑定 ✦</h2>
+  <p style="color:white;">あなたの運命を、さらに深く。</p>
+  <p style="color:#ddd;line-height:1.8;">
+    3か月・半年・1年の運勢と、
+    あなたに合わせた具体的な開運アドバイスをお届けします。
+  </p>
+  <h2 style="color:#eac783;">980円（税込）</h2>
+  <button type="button" disabled>本格鑑定へ進む（準備中）</button>
+  <p style="font-size:12px;color:#ccc;">買い切り・月額料金なし</p>
+</div>
+
 </main>
 <script>
 const API="https://ai-fortune-api.karen-nayuta-kanata.workers.dev/fortune";
@@ -92,6 +105,7 @@ plan:"free"
 if(!response.ok)throw Error("HTTP "+response.status);
 const data=await response.json();
 result.textContent=data.fortune||"鑑定結果を取得できませんでした。";
+document.getElementById("premium").style.display = data.fortune ? "block" : "none";
 }catch(err){
 result.textContent="通信エラーが発生しました。APIの設定を確認してください。";
 }finally{
