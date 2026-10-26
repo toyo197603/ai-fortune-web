@@ -135,7 +135,14 @@ body {
 <label for="birthday">生年月日</label>
 <input type="date" id="birthday" name="birthday" required
   style="width:100%;padding:14px;font-size:18px;">
-
+<label for="category">相談ジャンル</label>
+<select id="category" required style="box-sizing:border-box;width:100%;padding:14px;margin-top:8px;background:#211832;color:white;border:1px solid #c9a05d;border-radius:12px;font-size:16px;">
+<option value="">相談ジャンルを選択してください</option>
+<option value="恋愛・結婚">恋愛・結婚</option>
+<option value="仕事・転職・独立">仕事・転職・独立</option>
+<option value="金運・お金">金運・お金</option>
+<option value="人生・人間関係">人生・人間関係</option>
+</select>
 <label>相談したいこと<textarea id="question" required></textarea></label>
 <button id="submit">運命を鑑定する</button>
 </form>
@@ -171,6 +178,7 @@ body:JSON.stringify({
 name:document.getElementById("name").value,
 birthday: document.getElementById("birthday").value,
 question:document.getElementById("question").value,
+category:document.getElementById("category").value,
 plan:"free" 
 })
 });
