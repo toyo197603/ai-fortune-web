@@ -64,7 +64,18 @@ input, textarea {
 <p>あなたの未来に、光を。</p>
 <form id="form">
 <label>お名前<input id="name" required></label>
-<label>生年月日<input id="birthday" type="date" required></label>
+<label>生年月日</label>
+<div style="display:flex;gap:8px;">
+  <select id="year" required style="width:42%;padding:12px;font-size:16px;">
+    <option value="">年</option>
+  </select>
+  <select id="month" required style="width:29%;padding:12px;font-size:16px;">
+    <option value="">月</option>
+  </select>
+  <select id="day" required style="width:29%;padding:12px;font-size:16px;">
+    <option value="">日</option>
+  </select>
+</div>
 <label>相談したいこと<textarea id="question" required></textarea></label>
 <button id="submit">運命を鑑定する</button>
 </form>
@@ -85,6 +96,29 @@ input, textarea {
 
 </main>
 <script>
+const yearSelect=document.getElementById("year");
+const monthSelect=document.getElementById("month");
+const daySelect=document.getElementById("day");
+const currentYear=new Date().getFullYear();
+
+for(let y=currentYear;y>=1900;y--){
+  yearSelect.add(new Option(y+"年",y));
+}
+for(let m=1;m<=12;m++){
+  monthSelect.add(new Option(m+"月",m));
+}
+function updateDays(){
+  const previous=daySelect.value;
+  daySelect.length=1;
+  if(!yearSelect.value||!monthSelect.value)return;
+  const max=new Date(Number(yearSelect.value),Number(monthSelect.value),0).getDate();
+  for(let d=1;d<=max;d++){
+    daySelect.add(new Option(d+"日",d));
+  }
+  if(previous&&Number(previous)<=max)daySelect.value=previous;
+}
+yearSelect.addEventListener("change",updateDays);
+monthSelect.addEventListener("change",updateDays);
 const API="https://ai-fortune-api.karen-nayuta-kanata.workers.dev/fortune";
 document.getElementById("form").addEventListener("submit",async e=>{
 e.preventDefault();
@@ -98,7 +132,7 @@ method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
 name:document.getElementById("name").value,
-birthday:document.getElementById("birthday").value,
+birthday: `${yearSelect.value}-${monthSelect.value.padStart(2,"0")}-${daySelect.value.padStart(2,"0")}`,
 question:document.getElementById("question").value,
 plan:"free" 
 })
