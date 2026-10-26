@@ -118,5 +118,100 @@ btn.disabled=false;
 }
 });
 </script>
+<style>
+#birthWheelOverlay{position:fixed;inset:0;background:#0009;z-index:9999;display:none;align-items:flex-end;justify-content:center}
+#birthWheelPanel{background:#211a36;color:white;width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:22px 16px 35px;box-sizing:border-box}
+#birthWheelPanel h3{text-align:center;color:#eac783;margin:0 0 18px}
+.birthWheelCols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
+.birthWheelCol{height:220px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none}
+.birthWheelCol::-webkit-scrollbar{display:none}
+.birthWheelItem{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-size:19px;color:#c5bdd4}
+.birthWheelItem.selected{color:#eac783;font-weight:bold;font-size:23px}
+#birthWheelDone{width:100%;background:#d9ab60;color:#211a36;border:0;border-radius:12px;padding:15px;font-size:19px;font-weight:bold;margin-top:18px}
+</style>
+<script>
+(function(){
+const input=document.getElementById("birthday");
+if(!input)return;
+input.type="text";
+input.readOnly=true;
+input.placeholder="タップして生年月日を選択";
+input.style.cursor="pointer";
+const overlay=document.createElement("div");
+overlay.id="birthWheelOverlay";
+overlay.innerHTML='<div id="birthWheelPanel"><h3>生年月日を選択</h3><div class="birthWheelCols"><div class="birthWheelCol" id="bwYear"></div><div class="birthWheelCol" id="bwMonth"></div><div class="birthWheelCol" id="bwDay"></div></div><button type="button" id="birthWheelDone">決定</button></div>';
+document.body.appendChild(overlay);
+const now=new Date();
+let selected=[1985,1,1];
+const cols=["bwYear","bwMonth","bwDay"].map(id=>document.getElementById(id));
+function daysInMonth(y,m){return new Date(y,m,0).getDate()}
+function renderCol(index,values){
+const col=cols[index];
+col.innerHTML="";
+const spacer=()=>{const d=document.createElement("div");d.style.height="88px";return d};
+col.appendChild(spacer());
+values.forEach(v=>{
+const d=document.createElement("div");
+d.className="birthWheelItem";
+d.dataset.value=v;
+d.textContent=v+["年","月","日"][index];
+col.appendChild(d);
+});
+col.appendChild(spacer());
+}
+function renderDays(){
+const max=daysInMonth(selected[0],selected[1]);
+selected[2]=Math.min(selected[2],max);
+renderCol(2,Array.from({length:max},(_,i)=>i+1));
+scrollToValue(2);
+}
+function scrollToValue(i){
+const col=cols[i];
+const item=Array.from(col.querySelectorAll(".birthWheelItem")).find(el=>Number(el.dataset.value)===selected[i]);
+if(item)col.scrollTop=item.offsetTop-col.firstElementChild.offsetTop-88;
+highlight(i);
+}
+function highlight(i){
+cols[i].querySelectorAll(".birthWheelItem").forEach(el=>el.classList.toggle("selected",Number(el.dataset.value)===selected[i]));
+}
+renderCol(0,Array.from({length:now.getFullYear()-1899},(_,i)=>1900+i));
+renderCol(1,Array.from({length:12},(_,i)=>i+1));
+renderDays();
+cols.forEach((col,i)=>{
+let timer;
+col.addEventListener("scroll",()=>{
+clearTimeout(timer);
+timer=setTimeout(()=>{
+const items=Array.from(col.querySelectorAll(".birthWheelItem"));
+const center=col.scrollTop+col.clientHeight/2;
+let nearest=items[0],dist=Infinity;
+items.forEach(el=>{
+const d=Math.abs(el.offsetTop-col.offsetTop+el.offsetHeight/2-center);
+if(d<dist){dist=d;nearest=el}
+});
+if(!nearest)return;
+selected[i]=Number(nearest.dataset.value);
+highlight(i);
+if(i<2)renderDays();
+},90);
+});
+});
+input.addEventListener("click",()=>{
+const m=input.value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+if(m)selected=m.slice(1).map(Number);
+overlay.style.display="flex";
+renderDays();
+requestAnimationFrame(()=>cols.forEach((_,i)=>scrollToValue(i)));
+});
+overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.style.display="none"});
+document.getElementById("birthWheelDone").addEventListener("click",()=>{
+const pad=n=>String(n).padStart(2,"0");
+const iso=selected[0]+"-"+pad(selected[1])+"-"+pad(selected[2]);
+input.value=iso;
+input.dispatchEvent(new Event("change",{bubbles:true}));
+overlay.style.display="none";
+});
+})();
+</script>
 </body>
 </html>
