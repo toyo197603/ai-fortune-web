@@ -44,7 +44,8 @@ headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
 name:document.getElementById("name").value,
 birthday:document.getElementById("birthday").value,
-question:document.getElementById("question").value
+question:document.getElementById("question").value,
+plan:"free" 
 })
 });
 if(!response.ok)throw Error("HTTP "+response.status);
