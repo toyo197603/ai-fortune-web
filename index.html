@@ -222,7 +222,7 @@ btn.disabled=false;
 #birthWheelPanel{background:#211a36;color:white;width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:22px 16px 35px;box-sizing:border-box}
 #birthWheelPanel h3{text-align:center;color:#eac783;margin:0 0 18px}
 .birthWheelCols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
-.birthWheelCol{height:220px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none}
+.birthWheelCol{height:220px;overflow-y:auto;scroll-snap-type:y proximity;scroll-behavior:smooth;overscroll-behavior:contain;scrollbar-width:none}
 .birthWheelCol::-webkit-scrollbar{display:none}
 .birthWheelItem{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-size:19px;color:#c5bdd4}
 .birthWheelItem.selected{color:#eac783;font-weight:bold;font-size:23px}
