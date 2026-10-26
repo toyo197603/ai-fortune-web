@@ -150,8 +150,8 @@ body {
 
 <div id="premium" style="display:none;margin-top:30px;padding:25px 18px;border:1px solid #eac783;border-radius:18px;background:#211b35;text-align:center;">
   <h2 style="color:#eac783;font-size:clamp(12px,4.6vw,24px);font-weight:800;text-align:center;white-space:nowrap;letter-spacing:-0.5px;margin:0 0 28px;text-shadow:0 0 15px #a77c4670;">さらに深く知りたいあなたへ</h2>
-  <h2 style="color:#eac783;">✦ 本格運命鑑定 ✦</h2>
-  <p style="color:white;">あなたの運命を、さらに深く。</p>
+  <h2 id="premiumTitle" style="color:#eac783;">✦ 本格運命鑑定 ✦</h2>
+  <p id="premiumLead" style="color:white;">あなたの運命を、さらに深く。</p>
   <p style="color:#ddd;line-height:1.8;">
     3か月・半年・1年の運勢と、
     あなたに合わせた具体的な開運アドバイスをお届けします。
@@ -184,6 +184,30 @@ plan:"free"
 });
 if(!response.ok)throw Error("HTTP "+response.status);
 const data=await response.json();
+const category = document.getElementById("category").value;
+const premiumMessages = {
+  "恋愛・結婚": [
+    "✦ 本格恋愛・相性鑑定 ✦",
+    "あの人との相性、二人の関係性、これからの恋愛運を深く読み解きます。お相手の生年月日を使った相性鑑定にも対応予定です。"
+  ],
+  "仕事・転職・独立": [
+    "✦ 本格仕事運鑑定 ✦",
+    "あなたの才能や適職、転職・独立の可能性、今後の仕事運を詳しく読み解きます。"
+  ],
+  "金運・お金": [
+    "✦ 本格金運鑑定 ✦",
+    "あなたの金運の傾向、お金との向き合い方、豊かさにつながる行動のヒントを詳しく読み解きます。"
+  ],
+  "人生・人間関係": [
+    "✦ 本格人生鑑定 ✦",
+    "人生の転機、人間関係、自分らしい生き方と今後の運勢を詳しく読み解きます。"
+  ]
+};
+const premiumMessage = premiumMessages[category];
+if (premiumMessage) {
+  document.getElementById("premiumTitle").textContent = premiumMessage[0];
+  document.getElementById("premiumLead").textContent = premiumMessage[1];
+}
 result.textContent=(data.fortune||"鑑定結果を取得できませんでした").split(/【さらに深く知りたいあなたへ】|【もっと深く知りたいあなたへ】/)[0].trim();
 document.getElementById("premium").style.display = data.fortune ? "block" : "none";
 }catch(err){
