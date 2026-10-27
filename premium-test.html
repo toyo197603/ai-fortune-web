@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>天命の導き｜数秘術テスト</title>
+<style>
+body{background:#17132d;color:#f4e7cb;font-family:sans-serif;padding:24px;line-height:1.8}
+h1{color:#eac47a;font-size:24px}
+input,button{font-size:18px;padding:14px;border-radius:10px;max-width:100%;box-sizing:border-box}
+button{background:#eac47a;color:#17132d;border:0;margin-top:15px;font-weight:bold}
+#result{margin-top:25px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h1>天命の導き</h1>
+<p>数秘術・計算テスト</p>
+<label for="birthday">生年月日</label>
+<input type="date" id="birthday" value="1976-03-14">
+<br>
+<button id="testButton">鑑定計算をテスト</button>
+<div id="result"></div>
+<script src="./premium.js"></script>
+<script>
+document.getElementById("testButton").addEventListener("click",function(){
+const output=document.getElementById("result");
+try{
+const birthdate=document.getElementById("birthday").value;
+if(!birthdate){throw new Error("生年月日を選択してください");}
+const data=calculateLifePath(birthdate);
+output.textContent="計算成功！\n占術："+data.system+"\nライフパスナンバー："+data.lifePathNumber;
+}catch(error){
+output.textContent="エラー："+error.message;
+}
+});
+</script>
+</body>
+</html>
