@@ -54,6 +54,7 @@ const shichu = calculateYearPillar(birthdate, selectedBirthtime);
 
 output.textContent += "\n\n【四柱推命】\n年柱：" + (shichu.yearPillar ?? "要確認");
 const monthData = calculateMonthPillar(birthdate, selectedBirthtime);
+output.textContent += "\n月柱：" + (monthData.monthPillar ?? "要確認");
 const dayData = calculateDayPillar(birthdate);
 output.textContent += "\n日柱：" + dayData.dayPillar;
 // 四柱推命：出生時刻による時柱の表示
