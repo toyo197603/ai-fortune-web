@@ -472,3 +472,41 @@ const SHICHU_SETSUIRI_ANGLES = {
   11: 225, // 立冬
   12: 255  // 大雪
 };
+// 太陽黄経が指定角度に到達する日時を二分探索で求める
+function shichuFindSolarTerm(startDate, endDate, targetAngle) {
+  let low = startDate.getTime();
+  let high = endDate.getTime();
+
+  // 角度差を -180〜180 度に正規化
+  function angleDifference(time) {
+    const longitude = shichuSolarLongitude(new Date(time));
+    return ((longitude - targetAngle + 540) % 360) - 180;
+  }
+
+  if (
+    !Number.isFinite(low) ||
+    !Number.isFinite(high) ||
+    low >= high ||
+    !Number.isFinite(targetAngle)
+  ) {
+    return null;
+  }
+
+  // 探索範囲に指定角度の通過があるか確認
+  if (angleDifference(low) > 0 || angleDifference(high) < 0) {
+    return null;
+  }
+
+  // 40回の二分探索で通過時刻を絞り込む
+  for (let i = 0; i < 40; i++) {
+    const mid = (low + high) / 2;
+
+    if (angleDifference(mid) < 0) {
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+
+  return new Date(high);
+}
