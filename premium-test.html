@@ -37,6 +37,12 @@ button{background:#eac47a;color:#17132d;border:0;margin-top:15px;font-weight:bol
 document.getElementById("testButton").addEventListener("click",function(){
 const output=document.getElementById("result");
 try{
+  
+const selectedTimeKnown = document.getElementById("timeKnown").value;
+const selectedBirthtime = selectedTimeKnown === "yes"
+  ? document.getElementById("birthtime").value
+  : null;
+
 const birthdate=document.getElementById("birthday").value;
 if(!birthdate){throw new Error("生年月日を選択してください");}
 const data=calculateLifePath(birthdate); const maya=calculateMaya(birthdate); const zodiac=calculateZodiac(birthdate); const kyusei=calculateNineStar(birthdate);
