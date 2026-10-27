@@ -349,3 +349,17 @@ function calculateHourPillar(birthdate, birthtime) {
     needsVerification: hour === 23
   };
 }
+// 四柱推命：節入り日時データ（日本標準時）
+// 年ごとの検証済みデータを追加していく
+const SHICHU_SETSUIRI_EXACT = {};
+
+// 指定した年・月の節入り日時を取得
+function getExactSetsuiri(year, month) {
+  const yearData = SHICHU_SETSUIRI_EXACT[year];
+
+  if (!yearData || !yearData[month]) {
+    return null;
+  }
+
+  return yearData[month];
+}
