@@ -546,10 +546,25 @@ function shichuCalculateSetsuiri(year, month) {
 }
 // 高精度計算用：UTCから地球時（TT）への変換
 // ΔTは年代によって変化するため、年ごとに推定する
+
 function shichuDeltaTSeconds(year) {
+  if (!Number.isFinite(year)) {
+    return null;
+  }
+
   if (year >= 2005 && year <= 2050) {
     const t = year - 2000;
-    return 62.92 + 0.32217 * t + 0.005589 * t * t;
+    return 62.92 + 0.32217 * t
+      + 0.005589 * t * t;
+  }
+
+  if (year >= 1986 && year < 2005) {
+    const t = year - 2000;
+    return 63.86 + 0.3345 * t
+      - 0.060374 * t * t
+      + 0.0017275 * t * t * t
+      + 0.000651814 * Math.pow(t, 4)
+      + 0.00002373599 * Math.pow(t, 5);
   }
 
   if (year >= 1961 && year < 1986) {
@@ -559,9 +574,9 @@ function shichuDeltaTSeconds(year) {
       - (t * t * t) / 718;
   }
 
-  // 未対応年代は推測値を返さない
   return null;
 }
+
 // ΔTを考慮した太陽黄経の試験計算
 function shichuSolarLongitudeTT(date) {
   const year = date.getUTCFullYear();
