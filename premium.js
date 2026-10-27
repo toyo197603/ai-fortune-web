@@ -432,7 +432,9 @@ function shichuJulianDay(date) {
 // 太陽の見かけの黄経を概算する（単位：度）
 function shichuSolarLongitude(date) {
   const jd = shichuJulianDay(date);
-  const T = (jd - 2451545.0) / 36525;
+  const year = date.getUTCFullYear();
+const deltaT = 69;
+const T = (jd + deltaT / 86400 - 2451545.0) / 36525;
   const rad = Math.PI / 180;
 
   const L0 = 280.46646
