@@ -33,6 +33,7 @@ output.textContent += "\n\n【西洋占星術】\n太陽星座：" + zodiac.zodi
 output.textContent += "\n\n【九星気学】\n本命星：" + kyusei.star;
 const shichu = calculateYearPillar(birthdate);
 output.textContent += "\n\n【四柱推命】\n年柱：" + (shichu.yearPillar ?? "要確認");
+const monthData = calculateMonthPillar(birthdate); output.textContent += "\n月柱：" + (monthData.needsVerification ? "要確認（概算：" + monthData.monthPillar + "）" : monthData.monthPillar);
 }catch(error){
 output.textContent="エラー："+error.message;
 }
