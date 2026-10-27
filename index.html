@@ -90,14 +90,17 @@ main {
 
 #result {
   white-space: pre-wrap;
-  line-height: 2;
+  line-height: 1.8;
   margin-top: 35px;
-  padding: 24px 18px;
+  padding: 24px 12px;
   background: #211b38;
   border: 1px solid #776044;
   border-radius: 18px;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-break: strict;
 }
+
 button {
   background: linear-gradient(120deg,#eac783,#c99a4b);
   color: #24182e;
