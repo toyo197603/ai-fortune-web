@@ -32,13 +32,24 @@ button{background:#eac47a;color:#17132d;border:0;margin-top:15px;font-weight:bol
 <br>
 <button id="testButton">鑑定計算をテスト</button>
 <div id="result"></div>
-<script src="./premium.js?v=solar20241027c"></script>
+<script src="./premium.js?v=solar20241028d"></script>
 <button onclick="
 const d = shichuCalculateSetsuiri(2024, 2);
 alert(d ? '2024年立春（日本時間）: ' +
   d.toLocaleString('ja-JP', {timeZone:'Asia/Tokyo'})
   : '計算できませんでした');
 ">立春の自動計算テスト</button>
+<button onclick="
+const d = new Date('2024-02-04T08:27:00Z');
+const oldValue = shichuSolarLongitude(d);
+const newValue = shichuSolarLongitudeTT(d);
+alert(
+  '2024年2月4日 17:27 JST\n' +
+  '従来の太陽黄経: ' + oldValue.toFixed(6) + '度\n' +
+  'ΔT考慮後: ' + newValue.toFixed(6) + '度\n' +
+  '立春の目標: 315度'
+);
+">太陽黄経の比較テスト</button>
 <script>
 document.getElementById("testButton").addEventListener("click",function(){
 const output=document.getElementById("result");
