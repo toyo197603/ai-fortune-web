@@ -510,3 +510,26 @@ function shichuFindSolarTerm(startDate, endDate, targetAngle) {
 
   return new Date(high);
 }
+// 指定した年・月の節入り日時を自動計算する
+function shichuCalculateSetsuiri(year, month) {
+  const targetAngle = SHICHU_SETSUIRI_ANGLES[month];
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    !Number.isFinite(targetAngle)
+  ) {
+    return null;
+  }
+
+  // 節入りは各月の初旬に発生する
+  // UTCで1日〜10日を探索する
+  const startDate = new Date(Date.UTC(year, month - 1, 1));
+  const endDate = new Date(Date.UTC(year, month - 1, 10));
+
+  return shichuFindSolarTerm(
+    startDate,
+    endDate,
+    targetAngle
+  );
+}
