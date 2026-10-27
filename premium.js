@@ -567,3 +567,12 @@ function shichuSolarLongitudeTT(date) {
 
   return shichuSolarLongitude(ttDate);
 }
+// 高精度太陽黄経計算用：角度をラジアンに変換
+function shichuToRadians(degrees) {
+  return degrees * Math.PI / 180;
+}
+
+// 高精度太陽黄経計算用：角度を0〜360度に正規化
+function shichuNormalizeAngle(degrees) {
+  return ((degrees % 360) + 360) % 360;
+}
