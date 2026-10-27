@@ -222,7 +222,7 @@ function calculateYearPillar(birthdate) {
     throw new Error("存在しない日付です");
   }
 
-  if (month === 2 && day >= 3 && day <= 5) {
+  if (month === 2 && day >= 3 && day <= 4) {
     return {
       system: "四柱推命",
       yearPillar: null,
