@@ -280,3 +280,36 @@ function calculateMonthPillar(birthdate) {
       Math.abs(day - SHICHU_SETSUIRI[month - 1]) <= 2
   };
 }
+// 四柱推命：日柱の計算
+function calculateDayPillar(birthdate) {
+  const digits = birthdate.replace(/\D/g, "");
+
+  if (!/^\d{8}$/.test(digits)) {
+    throw new Error("生年月日の形式が正しくありません");
+  }
+
+  const year = Number(digits.slice(0, 4));
+  const month = Number(digits.slice(4, 6));
+  const day = Number(digits.slice(6, 8));
+
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    throw new Error("存在しない日付です");
+  }
+
+  // 2000年1月1日を戊午日として計算
+  const base = Date.UTC(2000, 0, 1);
+  const days = Math.round((date.getTime() - base) / 86400000);
+
+  const index = ((days + 54) % 60 + 60) % 60;
+
+  return {
+    system: "四柱推命",
+    dayPillar: SHICHU_60[index]
+  };
+}
