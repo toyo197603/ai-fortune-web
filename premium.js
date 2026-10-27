@@ -267,7 +267,7 @@ const SHICHU_SETSUIRI = [
 ];
 
 // 四柱推命：月柱の計算（節入り日は概算）
-function calculateMonthPillar(birthdate) {
+function calculateMonthPillar(birthdate, birthtime = null) {
   const digits = birthdate.replace(/\D/g, "");
   const year = Number(digits.slice(0, 4));
   const month = Number(digits.slice(4, 6));
@@ -278,10 +278,10 @@ function calculateMonthPillar(birthdate) {
   }
 
   // 節入り前なら前の節月として扱う
-  const beforeSetsuiri = day < SHICHU_SETSUIRI[month - 1];
+  const beforeSetsuiri = getExactSetsuiri(year, month) && birthtime ? compareBirthWithSetsuiri(birthdate, birthtime, year, month) === false : day < SHICHU_SETSUIRI[month - 1];
   const branchIndex = (month + 12 - (beforeSetsuiri ? 1 : 0)) % 12;
   // 年干を基準に寅月の天干を決定
-  const yearPillar = calculateYearPillar(birthdate);
+  const yearPillar = calculateYearPillar(birthdate, birthtime);
   if (yearPillar.needsVerification) {
     return { monthPillar: null, needsVerification: true };
   }
