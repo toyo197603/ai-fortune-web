@@ -202,3 +202,43 @@ const SHICHU_BRANCHES = [
 const SHICHU_60 = Array.from({ length: 60 }, (_, i) => {
   return SHICHU_STEMS[i % 10] + SHICHU_BRANCHES[i % 12];
 });
+// 四柱推命：年柱（立春付近は要確認）
+function calculateYearPillar(birthdate) {
+  const digits = birthdate.replace(/\D/g, "");
+  if (!/^\d{8}$/.test(digits)) {
+    throw new Error("生年月日の形式が正しくありません");
+  }
+
+  const year = Number(digits.slice(0, 4));
+  const month = Number(digits.slice(4, 6));
+  const day = Number(digits.slice(6, 8));
+
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    throw new Error("存在しない日付です");
+  }
+
+  if (month === 2 && day >= 3 && day <= 5) {
+    return {
+      system: "四柱推命",
+      yearPillar: null,
+      needsVerification: true
+    };
+  }
+
+  const pillarYear = month === 1 || (month === 2 && day <= 2)
+    ? year - 1
+    : year;
+
+  const index = ((pillarYear - 1984) % 60 + 60) % 60;
+
+  return {
+    system: "四柱推命",
+    yearPillar: SHICHU_60[index],
+    needsVerification: false
+  };
+}
