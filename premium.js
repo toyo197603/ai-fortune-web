@@ -313,3 +313,39 @@ function calculateDayPillar(birthdate) {
     dayPillar: SHICHU_60[index]
   };
 }
+// 四柱推命：時柱の計算
+function calculateHourPillar(birthdate, birthtime) {
+  // 出生時刻が不明なら計算しない
+  if (!birthtime) {
+    return {
+      hourPillar: null,
+      needsVerification: false
+    };
+  }
+
+  // 時刻の形式を確認
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(birthtime)) {
+    throw new Error("出生時刻の形式が正しくありません");
+  }
+
+  const hour = Number(birthtime.slice(0, 2));
+  const minute = Number(birthtime.slice(3, 5));
+
+  // 子時は23:00から始まる
+  const branchIndex = Math.floor(((hour + 1) % 24) / 2);
+
+  // 日柱の天干を取得
+  const dayData = calculateDayPillar(birthdate);
+  const dayStem = dayData.dayPillar[0];
+  const dayStemIndex = SHICHU_STEMS.indexOf(dayStem);
+
+  // 五鼠遁によって時干を決定
+  const startStemIndex = (dayStemIndex % 5) * 2;
+  const stemIndex = (startStemIndex + branchIndex) % 10;
+
+  return {
+    system: "四柱推命",
+    hourPillar: SHICHU_STEMS[stemIndex] + SHICHU_BRANCHES[branchIndex],
+    needsVerification: hour === 23
+  };
+}
