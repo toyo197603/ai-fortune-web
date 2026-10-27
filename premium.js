@@ -6,6 +6,7 @@ function calculateLifePath(birthdate) {
   const digits = birthdate.replace(/\D/g, "");
 
   if (!/^\d{8}$/.test(digits)) {
+    
     throw new Error("生年月日の形式が正しくありません");
   }
 
