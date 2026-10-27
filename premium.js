@@ -479,7 +479,7 @@ function shichuFindSolarTerm(startDate, endDate, targetAngle) {
 
   // 角度差を -180〜180 度に正規化
   function angleDifference(time) {
-    const longitude = shichuSolarLongitude(new Date(time));
+    const longitude = shichuSolarLongitudeTT(new Date(time));
     return ((longitude - targetAngle + 540) % 360) - 180;
   }
 
