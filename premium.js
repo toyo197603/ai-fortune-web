@@ -351,7 +351,15 @@ function calculateHourPillar(birthdate, birthtime) {
 }
 // 四柱推命：節入り日時データ（日本標準時）
 // 年ごとの検証済みデータを追加していく
-const SHICHU_SETSUIRI_EXACT = {};
+
+const SHICHU_SETSUIRI_EXACT = {
+  1976: {
+    2: "1976-02-05T01:40:00+09:00",
+    3: "1976-03-05T19:48:00+09:00",
+    4: "1976-04-05T00:47:00+09:00"
+  }
+};
+
 
 // 指定した年・月の節入り日時を取得
 function getExactSetsuiri(year, month) {
