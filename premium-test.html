@@ -27,8 +27,8 @@ const output=document.getElementById("result");
 try{
 const birthdate=document.getElementById("birthday").value;
 if(!birthdate){throw new Error("生年月日を選択してください");}
-const data=calculateLifePath(birthdate);
-output.textContent="計算成功！\n占術："+data.system+"\nライフパスナンバー："+data.lifePathNumber;
+const data=calculateLifePath(birthdate); const maya=calculateMaya(birthdate);
+output.textContent="計算成功！\n\n【数秘術】\nライフパスナンバー："+data.lifePathNumber+"\n\n【マヤ暦】\nKIN番号："+maya.kinNumber+"\n日の紋章："+maya.daySign+"\n音："+maya.tone;
 }catch(error){
 output.textContent="エラー："+error.message;
 }
