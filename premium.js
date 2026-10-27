@@ -262,8 +262,7 @@ function calculateMonthPillar(birthdate) {
 
   // 節入り前なら前の節月として扱う
   const beforeSetsuiri = day < SHICHU_SETSUIRI[month - 1];
-  const branchIndex = (month + 10 - (beforeSetsuiri ? 1 : 0)) % 12;
-
+  const branchIndex = (month + 12 - (beforeSetsuiri ? 1 : 0)) % 12;
   // 年干を基準に寅月の天干を決定
   const yearPillar = calculateYearPillar(birthdate);
   if (yearPillar.needsVerification) {
