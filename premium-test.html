@@ -32,7 +32,13 @@ button{background:#eac47a;color:#17132d;border:0;margin-top:15px;font-weight:bol
 <br>
 <button id="testButton">鑑定計算をテスト</button>
 <div id="result"></div>
-<script src="./premium.js?v=setsuiri20241027a"></script>
+<script src="./premium.js?v=solar20241027b"></script>
+<button onclick="
+const d = shichuCalculateSetsuiri(2024, 2);
+alert(d ? '2024年立春（日本時間）: ' +
+  d.toLocaleString('ja-JP', {timeZone:'Asia/Tokyo'})
+  : '計算できませんでした');
+">立春の自動計算テスト</button>
 <script>
 document.getElementById("testButton").addEventListener("click",function(){
 const output=document.getElementById("result");
