@@ -242,3 +242,42 @@ function calculateYearPillar(birthdate) {
     needsVerification: false
   };
 }
+
+// 四柱推命：月柱の節入り日（概算）
+const SHICHU_SETSUIRI = [
+  6, 4, 6, 5, 6, 6,
+  7, 8, 8, 8, 7, 7
+];
+
+// 四柱推命：月柱の計算（節入り日は概算）
+function calculateMonthPillar(birthdate) {
+  const digits = birthdate.replace(/\D/g, "");
+  const year = Number(digits.slice(0, 4));
+  const month = Number(digits.slice(4, 6));
+  const day = Number(digits.slice(6, 8));
+
+  if (!/^\d{8}$/.test(digits)) {
+    throw new Error("生年月日の形式が正しくありません");
+  }
+
+  // 節入り前なら前の節月として扱う
+  const beforeSetsuiri = day < SHICHU_SETSUIRI[month - 1];
+  const branchIndex = (month + 10 - (beforeSetsuiri ? 1 : 0)) % 12;
+
+  // 年干を基準に寅月の天干を決定
+  const yearPillar = calculateYearPillar(birthdate);
+  if (yearPillar.needsVerification) {
+    return { monthPillar: null, needsVerification: true };
+  }
+
+  const yearStemIndex = SHICHU_STEMS.indexOf(yearPillar.yearPillar[0]);
+  const tigerStemIndex = ((yearStemIndex % 5) * 2 + 2) % 10;
+  const monthOffset = (branchIndex - 2 + 12) % 12;
+  const stemIndex = (tigerStemIndex + monthOffset) % 10;
+
+  return {
+    monthPillar: SHICHU_STEMS[stemIndex] + SHICHU_BRANCHES[branchIndex],
+    needsVerification:
+      Math.abs(day - SHICHU_SETSUIRI[month - 1]) <= 2
+  };
+}
