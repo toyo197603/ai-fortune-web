@@ -219,7 +219,8 @@ if (premiumMessage) {
 }
 const fortuneText = String(data.fortune || "鑑定結果を取得できませんでした。");
 result.replaceChildren();
-fortuneText.split(/(\*\*[\s\S]+?\*\*)/g).forEach(part => {
+const spacedFortune = fortuneText.replace(/([^\n])\n(?=[①②③])/g, "$1\n\n");
+spacedFortune.split(/(\*\*[\s\S]+?\*\*)/g).forEach(part => {
   if (part.startsWith("**") && part.endsWith("**")) {
     const strong = document.createElement("strong");
     strong.textContent = part.slice(2, -2);
