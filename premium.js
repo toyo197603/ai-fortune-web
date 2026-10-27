@@ -187,3 +187,14 @@ function calculateNineStar(birthdate) {
     needsVerification: false
   };
 }
+
+// 四柱推命：十干・十二支の基本データ
+const SHICHU_STEMS = [
+  "甲", "乙", "丙", "丁", "戊",
+  "己", "庚", "辛", "壬", "癸"
+];
+
+const SHICHU_BRANCHES = [
+  "子", "丑", "寅", "卯", "辰", "巳",
+  "午", "未", "申", "酉", "戌", "亥"
+];
