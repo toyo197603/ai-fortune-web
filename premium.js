@@ -371,3 +371,36 @@ function getExactSetsuiri(year, month) {
 
   return yearData[month];
 }
+
+
+ // 出生日時が節入り前か後かを判定する（日本標準時）
+function compareBirthWithSetsuiri(birthdate, birthtime, year, month) {
+  const setsuiri = getExactSetsuiri(year, month);
+
+  if (!setsuiri || !birthtime) {
+    return null;
+  }
+
+  const digits = birthdate.replace(/\D/g, "");
+  if (!/^\d{8}$/.test(digits)) {
+    return null;
+  }
+
+  const birthISO =
+    digits.slice(0, 4) + "-" +
+    digits.slice(4, 6) + "-" +
+    digits.slice(6, 8) + "T" +
+    birthtime + ":00+09:00";
+
+  const birthTimestamp = Date.parse(birthISO);
+  const setsuiriTimestamp = Date.parse(setsuiri);
+
+  if (
+    !Number.isFinite(birthTimestamp) ||
+    !Number.isFinite(setsuiriTimestamp)
+  ) {
+    return null;
+  }
+
+  return birthTimestamp >= setsuiriTimestamp;
+}
