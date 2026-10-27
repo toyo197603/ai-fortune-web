@@ -18,10 +18,16 @@ button{background:#eac47a;color:#17132d;border:0;margin-top:15px;font-weight:bol
 <label for="birthday">生年月日</label>
 <input type="date" id="birthday" value="1976-03-14">
 <br>
-<label for="birthtime">出生時刻（任意）</label>
-<input type="time" id="birthtime">
+<label for="timeKnown">出生時刻</label>
+<select id="timeKnown" onchange="document.getElementById('birthtimeBox').style.display=this.value==='yes'?'block':'none'">
+  <option value="no">わからない</option>
+  <option value="yes">わかるので入力する</option>
+</select>
+<div id="birthtimeBox" style="display:none;margin-top:12px;">
+  <input type="time" id="birthtime">
+</div>
 <p style="font-size:13px;color:#bcb4d0;">
-  わからない場合は空欄のままで大丈夫です
+  出生時刻が不明でも鑑定できます
 </p>
 <br>
 <button id="testButton">鑑定計算をテスト</button>
