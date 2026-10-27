@@ -424,3 +424,8 @@ function compareBirthWithSetsuiri(birthdate, birthtime, year, month) {
 
   return birthTimestamp >= setsuiriTimestamp;
 }
+// 節入り自動計算エンジン
+// 日時からユリウス日を求める
+function shichuJulianDay(date) {
+  return date.getTime() / 86400000 + 2440587.5;
+}
