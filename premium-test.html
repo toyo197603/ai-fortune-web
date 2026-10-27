@@ -49,7 +49,9 @@ const data=calculateLifePath(birthdate); const maya=calculateMaya(birthdate); co
 output.textContent="計算成功！\n\n【数秘術】\nライフパスナンバー："+data.lifePathNumber+"\n\n【マヤ暦】\nKIN番号："+maya.kinNumber+"\n日の紋章："+maya.daySign+"\n音："+maya.tone;
 output.textContent += "\n\n【西洋占星術】\n太陽星座：" + zodiac.zodiac;
 output.textContent += "\n\n【九星気学】\n本命星：" + kyusei.star;
-const shichu = calculateYearPillar(birthdate);
+
+const shichu = calculateYearPillar(birthdate, selectedBirthtime);
+
 output.textContent += "\n\n【四柱推命】\n年柱：" + (shichu.yearPillar ?? "要確認");
 const monthData = calculateMonthPillar(birthdate); output.textContent += "\n月柱：" + (monthData.needsVerification ? "要確認（概算：" + monthData.monthPillar + "）" : monthData.monthPillar);
 const dayData = calculateDayPillar(birthdate);
