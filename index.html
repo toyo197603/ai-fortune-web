@@ -207,7 +207,18 @@ if (premiumMessage) {
   document.getElementById("premiumTitle").textContent = premiumMessage[0];
   document.getElementById("premiumLead").textContent = premiumMessage[1];
 }
-result.textContent=(data.fortune||"鑑定結果を取得できませんでした").split(/【さらに深く知りたいあなたへ】|【もっと深く知りたいあなたへ】/)[0].trim();
+const fortuneText = String(data.fortune || "鑑定結果を取得できませんでした。");
+result.replaceChildren();
+fortuneText.split(/(\*\*[\s\S]+?\*\*)/g).forEach(part => {
+  if (part.startsWith("**") && part.endsWith("**")) {
+    const strong = document.createElement("strong");
+    strong.textContent = part.slice(2, -2);
+    result.appendChild(strong);
+  } else {
+    result.appendChild(document.createTextNode(part));
+  }
+});
+
 document.getElementById("premium").style.display = data.fortune ? "block" : "none";
 }catch(err){
 result.textContent="通信エラーが発生しました。APIの設定を確認してください。";
