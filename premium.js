@@ -128,3 +128,62 @@ function calculateZodiac(birthdate) {
     zodiac: zodiac
   };
 }
+// 九星気学：本命星（立春付近は要確認）
+function calculateNineStar(birthdate) {
+  const digits = birthdate.replace(/\D/g, "");
+
+  if (!/^\d{8}$/.test(digits)) {
+    throw new Error("生年月日の形式が正しくありません");
+  }
+
+  const year = Number(digits.slice(0, 4));
+  const month = Number(digits.slice(4, 6));
+  const day = Number(digits.slice(6, 8));
+
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    throw new Error("存在しない日付です");
+  }
+
+  // 立春は通常2月3日～5日頃
+  // 境界日は精密な節入り時刻の確認が必要
+  if (month === 2 && day >= 3 && day <= 5) {
+    return {
+      system: "九星気学",
+      star: "立春の境界日のため要確認",
+      needsVerification: true
+    };
+  }
+
+  const adjustedYear =
+    month === 1 || (month === 2 && day <= 2)
+      ? year - 1
+      : year;
+
+  const stars = [
+    "一白水星",
+    "二黒土星",
+    "三碧木星",
+    "四緑木星",
+    "五黄土星",
+    "六白金星",
+    "七赤金星",
+    "八白土星",
+    "九紫火星"
+  ];
+
+  const number = ((11 - (adjustedYear % 9) - 1) % 9 + 9) % 9 + 1;
+
+  return {
+    system: "九星気学",
+    star: stars[number - 1],
+    starNumber: number,
+    adjustedYear: adjustedYear,
+    needsVerification: false
+  };
+}
