@@ -20,7 +20,7 @@ button{background:#eac47a;color:#17132d;border:0;margin-top:15px;font-weight:bol
 <br>
 <button id="testButton">鑑定計算をテスト</button>
 <div id="result"></div>
-<script src="./premium.js?v=kyusei1027a"></script>
+<script src="./premium.js?v=shichu1027a"></script>
 <script>
 document.getElementById("testButton").addEventListener("click",function(){
 const output=document.getElementById("result");
@@ -31,6 +31,8 @@ const data=calculateLifePath(birthdate); const maya=calculateMaya(birthdate); co
 output.textContent="計算成功！\n\n【数秘術】\nライフパスナンバー："+data.lifePathNumber+"\n\n【マヤ暦】\nKIN番号："+maya.kinNumber+"\n日の紋章："+maya.daySign+"\n音："+maya.tone;
 output.textContent += "\n\n【西洋占星術】\n太陽星座：" + zodiac.zodiac;
 output.textContent += "\n\n【九星気学】\n本命星：" + kyusei.star;
+const shichu = calculateShichu(birthdate);
+output.textContent += "\n\n【四柱推命】\n年柱：" + (shichu.yearPillar ?? "要確認");
 }catch(error){
 output.textContent="エラー："+error.message;
 }
