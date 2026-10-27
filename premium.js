@@ -382,15 +382,26 @@ const SHICHU_SETSUIRI_EXACT = {
 
 
 // 指定した年・月の節入り日時を取得
+
 function getExactSetsuiri(year, month) {
   const yearData = SHICHU_SETSUIRI_EXACT[year];
 
-  if (!yearData || !yearData[month]) {
+  // 検証済みの日時を優先
+  if (yearData && yearData[month]) {
+    return yearData[month];
+  }
+
+  // 未登録の年・月は自動計算
+  const calculated = shichuCalculateSetsuiri(year, month);
+
+  if (!(calculated instanceof Date) ||
+      !Number.isFinite(calculated.getTime())) {
     return null;
   }
 
-  return yearData[month];
+  return calculated.toISOString();
 }
+
 
 
  // 出生日時が節入り前か後かを判定する（日本標準時）
