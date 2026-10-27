@@ -198,3 +198,7 @@ const SHICHU_BRANCHES = [
   "子", "丑", "寅", "卯", "辰", "巳",
   "午", "未", "申", "酉", "戌", "亥"
 ];
+// 四柱推命：六十干支を生成
+const SHICHU_60 = Array.from({ length: 60 }, (_, i) => {
+  return SHICHU_STEMS[i % 10] + SHICHU_BRANCHES[i % 12];
+});
