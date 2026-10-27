@@ -551,3 +551,19 @@ function shichuDeltaTSeconds(year) {
   // 未対応年代は推測値を返さない
   return null;
 }
+// ΔTを考慮した太陽黄経の試験計算
+function shichuSolarLongitudeTT(date) {
+  const year = date.getUTCFullYear();
+  const deltaT = shichuDeltaTSeconds(year);
+
+  if (deltaT === null) {
+    return null;
+  }
+
+  // UTCから地球時TTへの近似変換
+  const ttDate = new Date(
+    date.getTime() + deltaT * 1000
+  );
+
+  return shichuSolarLongitude(ttDate);
+}
