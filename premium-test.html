@@ -32,7 +32,7 @@ button{background:#eac47a;color:#17132d;border:0;margin-top:15px;font-weight:bol
 <br>
 <button id="testButton">鑑定計算をテスト</button>
 <div id="result"></div>
-<script src="./premium.js?v=risshunexact1027e"></script>
+<script src="./premium.js?v=monthtime1027f"></script>
 <script>
 document.getElementById("testButton").addEventListener("click",function(){
 const output=document.getElementById("result");
@@ -53,7 +53,7 @@ output.textContent += "\n\n【九星気学】\n本命星：" + kyusei.star;
 const shichu = calculateYearPillar(birthdate, selectedBirthtime);
 
 output.textContent += "\n\n【四柱推命】\n年柱：" + (shichu.yearPillar ?? "要確認");
-const monthData = calculateMonthPillar(birthdate); output.textContent += "\n月柱：" + (monthData.needsVerification ? "要確認（概算：" + monthData.monthPillar + "）" : monthData.monthPillar);
+const monthData = calculateMonthPillar(birthdate, selectedBirthtime);
 const dayData = calculateDayPillar(birthdate);
 output.textContent += "\n日柱：" + dayData.dayPillar;
 // 四柱推命：出生時刻による時柱の表示
