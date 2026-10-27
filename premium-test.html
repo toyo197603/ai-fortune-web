@@ -50,6 +50,19 @@ alert(
   '立春の目標: 315度'
 );
 ">太陽黄経の比較テスト</button>
+<button onclick="
+const d = new Date('2024-02-04T08:27:00Z');
+const r = shichuCompareSolarLongitude(d);
+
+alert(r
+  ? '2024年2月4日 17:27 JST\n' +
+    '補正前：' + r.original.toFixed(6) + '度\n' +
+    '補正量：' + r.correction.toFixed(6) + '度\n' +
+    '補正後：' + r.corrected.toFixed(6) + '度\n' +
+    '目標：315度'
+  : '計算できませんでした'
+);
+">補正前後の比較テスト</button>
 <script>
 document.getElementById("testButton").addEventListener("click",function(){
 const output=document.getElementById("result");
