@@ -533,3 +533,21 @@ function shichuCalculateSetsuiri(year, month) {
     targetAngle
   );
 }
+// 高精度計算用：UTCから地球時（TT）への変換
+// ΔTは年代によって変化するため、年ごとに推定する
+function shichuDeltaTSeconds(year) {
+  if (year >= 2005 && year <= 2050) {
+    const t = year - 2000;
+    return 62.92 + 0.32217 * t + 0.005589 * t * t;
+  }
+
+  if (year >= 1961 && year < 1986) {
+    const t = year - 1975;
+    return 45.45 + 1.067 * t
+      - (t * t) / 260
+      - (t * t * t) / 718;
+  }
+
+  // 未対応年代は推測値を返さない
+  return null;
+}
