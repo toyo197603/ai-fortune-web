@@ -591,3 +591,32 @@ function shichuSolarCorrection(T) {
     0.00200 * Math.cos(C * rad)
   );
 }
+// 太陽黄経の補正前・補正後を比較する
+function shichuCompareSolarLongitude(date) {
+  const original = shichuSolarLongitudeTT(date);
+
+  if (original === null) {
+    return null;
+  }
+
+  const deltaT = shichuDeltaTSeconds(
+    date.getUTCFullYear()
+  );
+
+  const ttDate = new Date(
+    date.getTime() + deltaT * 1000
+  );
+
+  const jd = shichuJulianDay(ttDate);
+  const T = (jd - 2451545.0) / 36525;
+
+  const correction = shichuSolarCorrection(T);
+
+  return {
+    original: original,
+    correction: correction,
+    corrected: shichuNormalizeAngle(
+      original + correction
+    )
+  };
+}
