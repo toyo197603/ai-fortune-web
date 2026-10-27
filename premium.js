@@ -203,7 +203,7 @@ const SHICHU_60 = Array.from({ length: 60 }, (_, i) => {
   return SHICHU_STEMS[i % 10] + SHICHU_BRANCHES[i % 12];
 });
 // 四柱推命：年柱（立春付近は要確認）
-function calculateYearPillar(birthdate) {
+function calculateYearPillar(birthdate, birthtime = null) {
   const digits = birthdate.replace(/\D/g, "");
   if (!/^\d{8}$/.test(digits)) {
     throw new Error("生年月日の形式が正しくありません");
@@ -222,17 +222,34 @@ function calculateYearPillar(birthdate) {
     throw new Error("存在しない日付です");
   }
 
-  if (month === 2 && day >= 3 && day <= 4) {
-    return {
-      system: "四柱推命",
-      yearPillar: null,
-      needsVerification: true
-    };
+  
+const exactRisshun = getExactSetsuiri(year, 2);
+let pillarYear;
+
+
+if (exactRisshun && birthtime && month === 2) {
+
+  const afterRisshun = compareBirthWithSetsuiri(
+    birthdate, birthtime, year, 2
+  );
+
+  if (afterRisshun === null) {
+    throw new Error("立春時刻を判定できません");
   }
 
-  const pillarYear = month === 1 || (month === 2 && day <= 2)
-    ? year - 1
-    : year;
+  pillarYear = afterRisshun ? year : year - 1;
+} else if (month === 1 || (month === 2 && day <= 2)) {
+  pillarYear = year - 1;
+} else if (month === 2 && day <= 6) {
+  return {
+    system: "四柱推命",
+    yearPillar: null,
+    needsVerification: true
+  };
+} else {
+  pillarYear = year;
+}
+
 
   const index = ((pillarYear - 1984) % 60 + 60) % 60;
 
