@@ -576,3 +576,18 @@ function shichuToRadians(degrees) {
 function shichuNormalizeAngle(degrees) {
   return ((degrees % 360) + 360) % 360;
 }
+// 太陽の見かけの黄経に使う追加補正（度）
+function shichuSolarCorrection(T) {
+  const rad = Math.PI / 180;
+
+  // 金星・木星などの影響を含む小さな周期補正
+  const A = 153.23 + 22518.7541 * T;
+  const B = 216.57 + 45037.5082 * T;
+  const C = 312.69 + 32964.3577 * T;
+
+  return (
+    0.00134 * Math.cos(A * rad) +
+    0.00154 * Math.cos(B * rad) +
+    0.00200 * Math.cos(C * rad)
+  );
+}
