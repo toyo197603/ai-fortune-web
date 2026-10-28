@@ -129,7 +129,7 @@ function calculateZodiac(birthdate) {
   };
 }
 // 九星気学：本命星（立春付近は要確認）
-function calculateNineStar(birthdate) {
+function calculateNineStar(birthdate, birthtime = null) {
   const digits = birthdate.replace(/\D/g, "");
 
   if (!/^\d{8}$/.test(digits)) {
@@ -150,20 +150,23 @@ function calculateNineStar(birthdate) {
     throw new Error("存在しない日付です");
   }
 
-  // 立春は通常2月3日～5日頃
-  // 境界日は精密な節入り時刻の確認が必要
-  if (month === 2 && day >= 3 && day <= 5) {
+  
+  // 立春の正確な日時を基準に年を判定
+  const boundary = determineSetsuiriYear(
+    birthdate,
+    birthtime
+  );
+
+  if (boundary.needsVerification) {
     return {
       system: "九星気学",
-      star: "立春の境界日のため要確認",
+      star: "出生時刻の確認が必要",
       needsVerification: true
     };
   }
 
-  const adjustedYear =
-    month === 1 || (month === 2 && day <= 2)
-      ? year - 1
-      : year;
+  const adjustedYear = boundary.year;
+
 
   const stars = [
     "一白水星",
@@ -184,6 +187,69 @@ function calculateNineStar(birthdate) {
     star: stars[number - 1],
     starNumber: number,
     adjustedYear: adjustedYear,
+    needsVerification: false
+  };
+}
+
+
+// 立春の前後を日本標準時で判定する共通処理
+function determineSetsuiriYear(birthdate, birthtime = null) {
+  const digits = birthdate.replace(/\D/g, "");
+  if (!/^\d{8}$/.test(digits)) {
+    throw new Error("生年月日の形式が正しくありません");
+  }
+
+  const year = Number(digits.slice(0, 4));
+  const month = Number(digits.slice(4, 6));
+  const day = Number(digits.slice(6, 8));
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  if (date.getUTCFullYear() !== year ||
+      date.getUTCMonth() !== month - 1 ||
+      date.getUTCDate() !== day) {
+    throw new Error("存在しない日付です");
+  }
+
+  if (month === 1) {
+    return { year: year - 1, needsVerification: false };
+  }
+  if (month !== 2) {
+    return { year, needsVerification: false };
+  }
+
+  const term = getExactSetsuiri(year, 2);
+  if (!term || !Number.isFinite(Date.parse(term))) {
+    return { year: null, needsVerification: true };
+  }
+
+  const termJST = new Date(Date.parse(term) + 9 * 3600000);
+  const termDay = termJST.getUTCDate();
+
+  if (day < termDay) {
+    return { year: year - 1, needsVerification: false };
+  }
+  if (day > termDay) {
+    return { year, needsVerification: false };
+  }
+
+  if (!birthtime) {
+    return { year: null, needsVerification: true };
+  }
+
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(birthtime)) {
+    throw new Error("出生時刻の形式が正しくありません");
+  }
+
+  const after = compareBirthWithSetsuiri(
+    birthdate, birthtime, year, 2
+  );
+
+  if (after === null) {
+    return { year: null, needsVerification: true };
+  }
+
+  return {
+    year: after ? year : year - 1,
     needsVerification: false
   };
 }
@@ -223,32 +289,23 @@ function calculateYearPillar(birthdate, birthtime = null) {
   }
 
   
-const exactRisshun = getExactSetsuiri(year, 2);
-let pillarYear;
 
-
-if (exactRisshun && birthtime && month === 2) {
-
-  const afterRisshun = compareBirthWithSetsuiri(
-    birthdate, birthtime, year, 2
+  // 立春の日時を基準に年柱を判定
+  const boundary = determineSetsuiriYear(
+    birthdate,
+    birthtime
   );
 
-  if (afterRisshun === null) {
-    throw new Error("立春時刻を判定できません");
+  if (boundary.needsVerification) {
+    return {
+      system: "四柱推命",
+      yearPillar: null,
+      needsVerification: true
+    };
   }
 
-  pillarYear = afterRisshun ? year : year - 1;
-} else if (month === 1 || (month === 2 && day <= 2)) {
-  pillarYear = year - 1;
-} else if (month === 2 && day <= 6) {
-  return {
-    system: "四柱推命",
-    yearPillar: null,
-    needsVerification: true
-  };
-} else {
-  pillarYear = year;
-}
+  const pillarYear = boundary.year;
+
 
 
   const index = ((pillarYear - 1984) % 60 + 60) % 60;
