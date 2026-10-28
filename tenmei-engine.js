@@ -483,3 +483,62 @@ function tenmeiCalculateMonthPillar(birthdate, birthtime) {
     branch: SHICHU_BRANCHES[branchIndex]
   };
 }
+
+/* 四柱推命：時柱（日本標準時） */
+function tenmeiCalculateHourPillar(birthdate, birthtime) {
+  tenmeiParseBirthdate(birthdate);
+
+  if (
+    birthtime === undefined ||
+    birthtime === null ||
+    birthtime === ""
+  ) {
+    return {
+      status: "needsVerification",
+      reason: "出生時刻が不明のため時柱を計算できません"
+    };
+  }
+
+  const time = String(birthtime);
+
+  if (!/^\d{2}:\d{2}$/.test(time)) {
+    throw new Error("出生時刻はHH:MM形式で入力してください");
+  }
+
+  const [hour, minute] = time.split(":").map(Number);
+
+  if (hour > 23 || minute > 59) {
+    throw new Error("出生時刻が正しくありません");
+  }
+
+  /* 23時以降は日替わりの流派差がある */
+  if (hour === 23) {
+    return {
+      status: "needsVerification",
+      reason: "23時台は日柱の切替方式によって結果が異なります"
+    };
+  }
+
+  const dayResult = tenmeiCalculateDayPillar(birthdate);
+
+  const branchIndex =
+    Math.floor((hour + 1) / 2) % 12;
+
+  const dayStemIndex =
+    dayResult.index % 10;
+
+  const firstStemIndex =
+    (dayStemIndex % 5) * 2;
+
+  const stemIndex =
+    tenmeiMod(firstStemIndex + branchIndex, 10);
+
+  return {
+    status: "ok",
+    pillar:
+      SHICHU_STEMS[stemIndex] +
+      SHICHU_BRANCHES[branchIndex],
+    stem: SHICHU_STEMS[stemIndex],
+    branch: SHICHU_BRANCHES[branchIndex]
+  };
+}
