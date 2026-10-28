@@ -320,5 +320,30 @@ window.buildFortuneRequest = function () {
   };
 };
 </script>
+<script>
+window.testFortuneData = function () {
+  try {
+    const data = window.buildFortuneRequest();
+    const ok = data.readings.length === 7 &&
+      data.readings.every(r => r.result && r.interpretation);
+
+    alert(ok
+      ? "7占術データ生成成功"
+      : "7占術データに不足があります");
+  } catch (error) {
+    alert("データ確認エラー：" + error.message);
+  }
+};
+
+const dataTestButton = document.createElement("button");
+dataTestButton.type = "button";
+dataTestButton.textContent = "7占術データ確認";
+dataTestButton.style.cssText =
+  "display:block;margin:20px auto;padding:14px;" +
+  "background:#eac47a;color:#17132d;border:0;border-radius:10px;";
+
+dataTestButton.addEventListener("click", window.testFortuneData);
+document.body.appendChild(dataTestButton);
+</script>
 </body>
 </html>
