@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>天命の導き｜境界テスト</title>
+<style>
+body{font-family:-apple-system,sans-serif;background:#f5f6f8;padding:20px;color:#24344d}
+h1{font-size:23px}
+button{width:100%;padding:17px;background:#243f69;color:white;border:0;border-radius:12px;font-size:17px}
+.card{background:white;border-radius:12px;padding:15px;margin:14px 0}
+.ok{color:#16804a;font-weight:bold}
+.ng{color:#c83232;font-weight:bold}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}
+</style>
+</head>
+<body>
+<h1>天命の導き｜境界テスト</h1>
+<p>立春と毎月の節入り前後を検証します。</p>
+<button onclick="runBoundaryTest()">境界テストを実行</button>
+<div id="result"></div>
+
+<script src="./tenmei-engine.js"></script>
+<script>
+function runBoundaryTest(){
+ const output=document.getElementById("result");
+ output.innerHTML="";
+ let pass=0,fail=0;
+
+ function check(name,condition,detail){
+   if(condition)pass++;else fail++;
+   const card=document.createElement("div");
+   card.className="card";
+   const title=document.createElement("div");
+   title.className=condition?"ok":"ng";
+   title.textContent=(condition?"合格 ":"要確認 ")+name;
+   const pre=document.createElement("pre");
+   pre.textContent=detail;
+   card.append(title,pre);
+   output.appendChild(card);
+ }
+
+ function dateStr(ms){
+   const d=new Date(ms+9*3600000);
+   return d.getUTCFullYear()+
+     String(d.getUTCMonth()+1).padStart(2,"0")+
+     String(d.getUTCDate()).padStart(2,"0");
+ }
+
+ try{
+   const years=[1920,1976,2000,2026,2030];
+
+   for(const year of years){
+     for(let month=1;month<=12;month++){
+       const term=tenmeiGetSetsuiri(year,month);
+       const name=year+"年"+month+"月";
+
+       if(!term||!Number.isFinite(term.timestamp)){
+         check(name,false,"節入りデータなし");
+         continue;
+       }
+
+       const jst=new Date(term.timestamp+9*3600000);
+       const validMonth=jst.getUTCFullYear()===year &&
+         jst.getUTCMonth()+1===month;
+
+       check(name+" データ年月",validMonth,
+         jst.toISOString()+" (JST換算)");
+
+       const before=dateStr(term.timestamp-4*86400000);
+       const after=dateStr(term.timestamp+4*86400000);
+
+       const a=tenmeiCalculateMonthPillar(before);
+       const b=tenmeiCalculateMonthPillar(after);
+
+       check(name+" 月柱切替",
+         a.status==="ok" &&
+         b.status==="ok" &&
+         a.pillar!==b.pillar,
+         before+": "+JSON.stringify(a)+
+         "\n"+after+": "+JSON.stringify(b));
+
+       if(month===2){
+         const ya=tenmeiCalculateYearPillarSafe(before);
+         const yb=tenmeiCalculateYearPillarSafe(after);
+         check(name+" 年柱切替",
+           ya.status==="ok" &&
+           yb.status==="ok" &&
+           ya.pillar!==yb.pillar,
+           before+": "+JSON.stringify(ya)+
+           "\n"+after+": "+JSON.stringify(yb));
+       }
+     }
+   }
+ }catch(error){
+   check("プログラム実行",false,error.stack||String(error));
+ }
+
+ const summary=document.createElement("h2");
+ summary.textContent="合格 "+pass+"件 / 要確認 "+fail+"件";
+ output.prepend(summary);
+}
+</script>
+</body>
+</html>
