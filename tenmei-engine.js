@@ -461,7 +461,7 @@ function tenmeiCalculateMonthPillar(birthdate, birthtime) {
     ? (month === 1 ? 12 : month - 1)
     : month;
 
-  const monthIndex = tenmeiMod(solarMonth + 9, 12);
+  const monthIndex = tenmeiMod(solarMonth - 2, 12);
 
   const yearStemIndex = yearResult.index % 10;
 
