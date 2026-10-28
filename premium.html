@@ -241,5 +241,34 @@ $("tarotResult").innerHTML=`<article class="reading">
 });
 })();
 </script>
+<script>
+const FORTUNE_API =
+  "https://ai-fortune-api.karen-nayuta-kanata.workers.dev/health";
+
+async function checkFortuneAPI() {
+  try {
+    const response = await fetch(FORTUNE_API);
+    const data = await response.json();
+    alert(
+      response.ok && data.status === "ok"
+        ? "AIサーバー接続成功"
+        : "接続エラー：" + response.status
+    );
+  } catch (error) {
+    alert("通信エラー：" + error.message);
+  }
+}
+
+const testButton = document.createElement("button");
+testButton.textContent = "AIサーバー接続テスト";
+testButton.type = "button";
+testButton.style.cssText =
+  "display:block;margin:24px auto;padding:14px 20px;" +
+  "background:#eac47a;color:#17132d;border:0;border-radius:10px;" +
+  "font-size:16px;font-weight:bold;";
+
+testButton.addEventListener("click", checkFortuneAPI);
+document.body.appendChild(testButton);
+</script>
 </body>
 </html>
