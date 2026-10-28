@@ -395,3 +395,91 @@ function tenmeiCalculateLifePath(birthdate) {
     method: "全桁合算・11/22/33保持"
   };
 }
+
+/* 四柱推命：月柱（節入り基準） */
+function tenmeiCalculateMonthPillar(birthdate, birthtime) {
+  const { year, month, day } =
+    tenmeiParseBirthdate(birthdate);
+
+  const yearResult =
+    tenmeiCalculateYearPillarSafe(birthdate, birthtime);
+
+  if (yearResult.status !== "ok") {
+    return yearResult;
+  }
+
+  const term = tenmeiGetSetsuiri(year, month);
+
+  if (!term) {
+    return {
+      status: "needsVerification",
+      reason: "月の節入りデータがありません"
+    };
+  }
+
+  let start;
+  let end;
+
+  if (birthtime !== undefined &&
+      birthtime !== null &&
+      birthtime !== "") {
+    if (!/^\d{2}:\d{2}$/.test(String(birthtime))) {
+      throw new Error("出生時刻はHH:MM形式で入力してください");
+    }
+
+    const [hour, minute] =
+      String(birthtime).split(":").map(Number);
+
+    if (hour > 23 || minute > 59) {
+      throw new Error("出生時刻が正しくありません");
+    }
+
+    start = Date.UTC(
+      year, month - 1, day, hour - 9, minute
+    );
+    end = start;
+  } else {
+    start = Date.UTC(year, month - 1, day, -9);
+    end = start + 86400000;
+  }
+
+  const margin = term.uncertaintyMs;
+
+  if (
+    start - margin <= term.timestamp &&
+    end + margin >= term.timestamp
+  ) {
+    return {
+      status: "needsVerification",
+      reason: "節入り境界付近のため月柱を確定できません"
+    };
+  }
+
+  const beforeTerm = end < term.timestamp;
+
+  const solarMonth = beforeTerm
+    ? (month === 1 ? 12 : month - 1)
+    : month;
+
+  const monthIndex = tenmeiMod(solarMonth + 9, 12);
+
+  const yearStemIndex = yearResult.index % 10;
+
+  const tigerStemIndex =
+    tenmeiMod((yearStemIndex % 5) * 2 + 2, 10);
+
+  const stemIndex =
+    tenmeiMod(tigerStemIndex + monthIndex, 10);
+
+  const branchIndex =
+    tenmeiMod(monthIndex + 2, 12);
+
+  return {
+    status: "ok",
+    pillar:
+      SHICHU_STEMS[stemIndex] +
+      SHICHU_BRANCHES[branchIndex],
+    stem: SHICHU_STEMS[stemIndex],
+    branch: SHICHU_BRANCHES[branchIndex]
+  };
+}
