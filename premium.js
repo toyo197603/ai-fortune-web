@@ -696,7 +696,11 @@ function shichuDeltaTSeconds(year) {
 // ΔTを考慮した太陽黄経の試験計算
 function shichuSolarLongitudeTT(date) {
   const year = date.getUTCFullYear();
-  const deltaT = shichuDeltaTSeconds(year);
+  
+const deltaT = shichuDeltaTSeconds(
+  year + (date.getUTCMonth() + 0.5) / 12
+);
+
 
   if (deltaT === null) {
     return null;
