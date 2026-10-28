@@ -1,0 +1,245 @@
+
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>天命の導き｜特別鑑定</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#34305c,#10132b 48%,#080b1a);color:#f5e9cf;font-family:-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;line-height:1.85;min-height:100vh}
+.wrap{max-width:760px;margin:auto;padding:30px 17px 80px}
+.top{text-align:center;padding:28px 8px 18px}
+.eyebrow{letter-spacing:.3em;color:#d6bb80;font-size:11px}
+h1{font-family:serif;font-weight:500;font-size:clamp(34px,9vw,53px);letter-spacing:.16em;margin:15px 0}
+h2{font-size:21px;color:#e8c98a;font-family:serif;font-weight:500;margin:0 0 14px}
+p{margin:10px 0}
+.lead{color:#d8cfce;font-size:14px}
+.panel,.reading{background:#13162ed9;border:1px solid #e6c67f57;border-radius:18px;padding:23px 19px;margin:20px 0;box-shadow:0 10px 35px #05071344}
+label{display:block;font-size:13px;color:#d7c7a4;margin:15px 0 7px}
+input{width:100%;padding:13px;border:1px solid #9c865a;border-radius:10px;background:#191d38;color:#fff5dc;font-size:16px;min-height:48px;color-scheme:dark}
+button{border:0;cursor:pointer;font-size:15px}
+.primary{width:100%;background:linear-gradient(120deg,#b78c46,#f5d998,#c29855);color:#1b1520;font-weight:bold;padding:16px;border-radius:11px;margin-top:22px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px}
+.tabs button{border:1px solid #7e6a4b;border-radius:8px;padding:10px 2px;color:#f5e9cf;background:#1b203b}
+.tabs button.on{background:#d4b575;color:#18142a;font-weight:bold}
+.tag{display:inline-block;color:#f1d493;font-size:12px;letter-spacing:.12em;margin-bottom:8px}
+.result{display:none}
+.reading{margin:13px 0}
+.reading h3{font-size:19px;color:#f1d492;margin:0 0 8px;font-family:serif}
+.key{color:#fff4db;font-weight:bold}
+.note{font-size:12px;color:#b9b6c4}
+.error{color:#ffc3b9}
+.tarot{border:1px solid #aa925d;background:#25203d;color:#f7e4b5;border-radius:10px;padding:12px 18px}
+.footer{text-align:center;color:#9e9aaa;font-size:11px;margin-top:30px}
+@media(max-width:360px){.wrap{padding:20px 12px}.panel{padding:18px 14px}.tabs button{font-size:13px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="top">
+<div class="eyebrow">PREMIUM READING</div>
+<h1>天命の導き</h1>
+<p class="lead">七つの占術から、自分らしい選択のヒントを見つける</p>
+</header>
+
+<section class="panel">
+<h2>あなたのことを教えてください</h2>
+<label for="birth">生年月日</label>
+<input id="birth" type="date" min="1920-01-01" max="2030-12-31">
+<label for="birthtime">出生時刻（わからなければ空欄）</label>
+<input id="birthtime" type="time">
+<label>相談したいテーマ</label>
+<div class="tabs" id="tabs">
+<button type="button" class="on" data-theme="恋愛">恋愛</button>
+<button type="button" data-theme="仕事">仕事</button>
+<button type="button" data-theme="人生">人生</button>
+<button type="button" data-theme="財運">財運</button>
+</div>
+<button class="primary" id="start" type="button">七つの鑑定をひらく</button>
+<p id="error" class="error" role="alert"></p>
+</section>
+
+<section id="result" class="result" aria-live="polite">
+<div class="panel">
+<div class="eyebrow">YOUR READING</div>
+<h2 id="headline"></h2>
+<p id="intro"></p>
+<p class="note">占術の伝統的な解釈をもとにした自己理解のための読み物です。未来や成果を保証するものではありません。</p>
+</div>
+<div id="cards"></div>
+<div class="panel">
+<h2>七つ目の導き｜タロット</h2>
+<p>今のテーマを心に思い浮かべ、カードを1枚引いてください。</p>
+<button type="button" class="tarot" id="draw">カードを引く</button>
+<div id="tarotResult"></div>
+</div>
+<div class="panel">
+<h2>今日からの一歩</h2>
+<p id="action"></p>
+</div>
+</section>
+<div class="footer">天命の導き · 特別鑑定テスト版</div>
+</main>
+
+<script src="premium.js"></script>
+<script>
+(()=>{
+"use strict";
+let theme="恋愛",last=null;
+const $=id=>document.getElementById(id);
+const meanings={
+恋愛:[
+"相手の気持ちを決めつけず、言葉で確かめることが関係を育てます。",
+"心地よい距離感を保ちながら、あなたの望みも丁寧に伝えてみましょう。",
+"今の関係に必要なのは、答えを急ぐことより小さな信頼の積み重ねです。"
+],
+仕事:[
+"得意な役割を明確にすると、周囲との協力が進みやすくなります。",
+"成果だけでなく、続けられる働き方にも目を向けてみましょう。",
+"新しい挑戦は、小さな検証を重ねることで現実的な選択肢になります。"
+],
+人生:[
+"これまで大切にしてきた価値観を、今の自分の言葉で整理してみましょう。",
+"他人の期待より、自分が納得できる選択を一つずつ増やしていきましょう。",
+"変化を急ぐ必要はありません。続けたいことと手放したいことを分けてみましょう。"
+],
+財運:[
+"大きな判断の前に、支出・貯蓄・リスクを数字で整理しましょう。",
+"収入を増やす工夫と、守る仕組みの両方を意識してみましょう。",
+"焦りによる決断を避け、期限と予算を決めて選択することが大切です。"
+]
+};
+const tarot=[
+["魔術師","始まり","使える資源を整理し、小さな行動に移す"],
+["女教皇","内省","静かな時間をとり、違和感の理由を確かめる"],
+["女帝","育成","すでに育っているものに目を向ける"],
+["皇帝","基盤","責任と境界線を明確にする"],
+["恋人","選択","自分の価値観に沿って選ぶ"],
+["戦車","前進","方向を定め、実行する"],
+["力","しなやかさ","強引さより粘り強さを選ぶ"],
+["隠者","探求","一人で考える時間を確保する"],
+["運命の輪","転機","変化に備え柔軟性を持つ"],
+["正義","均衡","事実と感情を分けて判断する"],
+["吊るされた男","転換","別の立場から状況を眺める"],
+["死神","区切り","終わらせるべき習慣を見直す"],
+["節制","調和","無理のない配分を探す"],
+["星","希望","長期的な目標を言葉にする"],
+["太陽","明朗","喜びを周囲と分かち合う"],
+["世界","統合","達成したことを振り返る"]
+];
+const safe=v=>String(v??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",
+'"':"&quot;","'":"&#39;"
+}[c]));
+function section(name,value,desc,idx){
+return `<article class="reading">
+<div class="tag">${String(idx).padStart(2,"0")} / SEVEN WISDOMS</div>
+<h3>${safe(name)}</h3>
+<p class="key">${safe(value)}</p>
+<p>${safe(desc)}</p>
+<p>${safe(meanings[theme][(idx-1)%3])}</p>
+</article>`;
+}
+function getDate(){
+const v=$("birth").value;
+if(!/^\d{4}-\d{2}-\d{2}$/.test(v))
+throw Error("生年月日を入力してください");
+const digits=v.replaceAll("-","");
+const y=+digits.slice(0,4),m=+digits.slice(4,6),d=+digits.slice(6,8);
+const dt=new Date(Date.UTC(y,m-1,d));
+if(dt.getUTCFullYear()!==y||
+dt.getUTCMonth()+1!==m||
+dt.getUTCDate()!==d||
+y<1920||y>2030)
+throw Error("1920〜2030年の正しい日付を入力してください");
+return {digits,y,m,d};
+}
+function make(){
+const {digits,y,m,d}=getDate();
+const time=$("birthtime").value||null;
+for(const fn of [
+"calculateLifePath","calculateMaya","calculateZodiac",
+"calculateNineStar","calculateYearPillar",
+"calculateMonthPillar","calculateDayPillar"
+]){
+if(typeof window[fn]!=="function")
+throw Error("鑑定エンジンが読み込まれていません: "+fn);
+}
+const life=calculateLifePath(digits);
+const maya=calculateMaya(digits);
+const zodiac=calculateZodiac(digits);
+const nine=calculateNineStar(digits,time);
+const year=calculateYearPillar(digits,time);
+const month=calculateMonthPillar(digits,time);
+const day=calculateDayPillar(digits);
+let hour=null;
+if(time&&typeof calculateHourPillar==="function")
+hour=calculateHourPillar(digits,time);
+const yearText=year.yearPillar||"節入り境界のため要確認";
+const monthText=month.monthPillar||"節入り境界のため要確認";
+const dayText=day.dayPillar||"算出不可";
+const eto=year.yearPillar||"立春付近のため要確認";
+const rows=[
+["数秘術",`ライフパス ${life.lifePathNumber}`,
+"生年月日の数字を合計し、基本的な資質を象徴する数字として読み解きます。"],
+["マヤ暦",`KIN ${maya.kinNumber} · ${maya.daySign} · 音${maya.tone}`,
+"伝統的ツォルキン暦の周期を使い、自分のリズムや物事への向き合い方を考えます。"],
+["西洋占星術",zodiac.zodiac,
+"生年月日から求めた太陽星座です。出生図全体の鑑定ではありません。"],
+["四柱推命",`年柱 ${yearText} ／ 月柱 ${monthText} ／ 日柱 ${dayText}${hour?.hourPillar?" ／ 時柱 "+hour.hourPillar:""}`,
+"干支の組み合わせから資質を考える伝統的な体系です。節入り当日や23時台は確認が必要です。"],
+["九星気学",nine.star,
+"立春を年の境界とする本命星です。立春当日は出生時刻によって要確認となる場合があります。"],
+["十二支・干支",eto,
+"四柱推命の年柱と共通の暦計算を用います。独立した予測ではなく、年の象徴を別の角度から読みます。"]
+];
+last={rows,digits};
+$("headline").textContent=theme+"についての七つの導き";
+$("intro").textContent=`生年月日 ${y}年${m}月${d}日。異なる占術を照らし合わせ、今のあなたに役立つ問いを探していきましょう。`;
+$("cards").innerHTML=rows.map((r,i)=>section(...r,i+1)).join("");
+$("tarotResult").innerHTML="";
+$("action").textContent=meanings[theme].join(" ");
+$("result").style.display="block";
+$("result").scrollIntoView({behavior:"smooth",block:"start"});
+}
+$("tabs").addEventListener("click",e=>{
+const b=e.target.closest("button[data-theme]");
+if(!b)return;
+theme=b.dataset.theme;
+document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on",x===b));
+if(last){
+try{make()}catch(err){$("error").textContent=err.message}
+}
+});
+$("start").addEventListener("click",()=>{
+try{
+$("error").textContent="";
+make();
+}catch(err){
+$("error").textContent=err.message;
+$("result").style.display="none";
+}
+});
+$("draw").addEventListener("click",()=>{
+if(!last)return;
+const a=new Uint32Array(2);
+if(window.crypto?.getRandomValues)
+crypto.getRandomValues(a);
+else{
+a[0]=Math.floor(Math.random()*4294967296);
+a[1]=Math.floor(Math.random()*4294967296);
+}
+const c=tarot[a[0]%tarot.length];
+const rev=a[1]%2===1;
+$("tarotResult").innerHTML=`<article class="reading">
+<h3>${safe(c[0])} · ${rev?"逆位置":"正位置"}</h3>
+<p class="key">${safe(c[1])}</p>
+<p>${safe(rev?"今は立ち止まり、"+c[2]+"ことを意識しましょう。":c[2]+"ことがヒントになります。")}</p>
+<p class="note">カードは抽選による象徴的なメッセージです。</p>
+</article>`;
+});
+})();
+</script>
+</body>
+</html>
