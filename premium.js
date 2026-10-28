@@ -667,6 +667,22 @@ function shichuDeltaTSeconds(year) {
       + 0.00002373599 * Math.pow(t, 5);
   }
 
+  // 1920〜1941年：ΔTの近似式
+  if (year >= 1920 && year < 1941) {
+    const t = year - 1920;
+    return 21.20 + 0.84493 * t
+      - 0.076100 * t * t
+      + 0.0020936 * t * t * t;
+  }
+
+  // 1941〜1961年：ΔTの近似式
+  if (year >= 1941 && year < 1961) {
+    const t = year - 1950;
+    return 29.07 + 0.407 * t
+      - (t * t) / 233
+      + (t * t * t) / 2547;
+  }
+
   if (year >= 1961 && year < 1986) {
     const t = year - 1975;
     return 45.45 + 1.067 * t
