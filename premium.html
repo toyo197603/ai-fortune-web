@@ -276,5 +276,49 @@ document.body.appendChild(testButton);
   overflow-wrap:anywhere;"
   hidden>
 </section>
+<script>
+window.buildFortuneRequest = function () {
+  const birth = document.getElementById("birth").value;
+  const birthtime = document.getElementById("birthtime").value;
+  const selected = document.querySelector("#tabs button.on");
+  const theme = selected?.dataset.theme;
+
+  const cards = [...document.querySelectorAll("#cards .reading")];
+  const tarot = document.querySelector("#tarotResult .reading");
+
+  if (cards.length !== 6 || !tarot) {
+    throw new Error("先に七つの鑑定とタロットを実行してください");
+  }
+
+  const systems = [
+    "数秘術", "マヤ暦", "西洋占星術",
+    "四柱推命", "九星気学", "十二支・干支"
+  ];
+
+  const readings = cards.map((card, i) => ({
+    system: systems[i],
+    result: card.querySelector(".key")?.textContent || "",
+    interpretation: [...card.querySelectorAll("p")]
+      .filter(p => !p.classList.contains("key"))
+      .map(p => p.textContent).join(" ")
+  }));
+
+  readings.push({
+    system: "タロット",
+    result: tarot.querySelector("h3")?.textContent || "",
+    interpretation: [...tarot.querySelectorAll("p")]
+      .map(p => p.textContent).join(" ")
+  });
+
+  return {
+    name: "",
+    birthday: birth,
+    birthtime,
+    theme,
+    question: theme + "について、自分に必要な選択と行動を知りたい",
+    readings
+  };
+};
+</script>
 </body>
 </html>
