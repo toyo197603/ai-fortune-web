@@ -593,3 +593,37 @@ function tenmeiCalculateFourPillars(birthdate, birthtime) {
     warnings: warnings
   };
 }
+// ========================================
+// 天命の導き：四柱推命テスト機能
+// ========================================
+
+function tenmeiRunTest() {
+  const testCases = [
+    { name: "1976年3月14日", birthdate: "1976-03-14" },
+    { name: "2000年1月1日", birthdate: "2000-01-01" },
+    { name: "2026年10月28日", birthdate: "2026-10-28" }
+  ];
+
+  return testCases.map(test => {
+    try {
+      const result = tenmeiCalculateFourPillars(
+        test.birthdate
+      );
+
+      return {
+        test: test.name,
+        status: result.status,
+        year: result.pillars.year,
+        month: result.pillars.month,
+        day: result.pillars.day,
+        hour: result.pillars.hour,
+        warnings: result.warnings
+      };
+    } catch (error) {
+      return {
+        test: test.name,
+        error: error.message
+      };
+    }
+  });
+}
