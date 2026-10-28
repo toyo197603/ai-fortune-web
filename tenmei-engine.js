@@ -301,3 +301,31 @@ const TENMEI_SETSUIRI_DATA = {
 "2030":[1893828634000,1896376108000,1898946199000,1901554862000,1904208379000,1906901070000,1909616129000,1912330040000,1915019570000,1917668716000,1920272923000,1922839657000],
 
 };
+
+function tenmeiGetSetsuiri(year, month) {
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    month < 1 ||
+    month > 12
+  ) {
+    return null;
+  }
+
+  const data = TENMEI_SETSUIRI_DATA[String(year)];
+
+  if (!Array.isArray(data) || data.length !== 12) {
+    return null;
+  }
+
+  const timestamp = data[month - 1];
+
+  if (!Number.isFinite(timestamp)) {
+    return null;
+  }
+
+  return {
+    timestamp: timestamp,
+    uncertaintyMs: 86400000
+  };
+}
