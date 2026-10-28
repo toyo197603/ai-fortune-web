@@ -542,3 +542,54 @@ function tenmeiCalculateHourPillar(birthdate, birthtime) {
     branch: SHICHU_BRANCHES[branchIndex]
   };
 }
+
+/* 四柱推命：年柱・月柱・日柱・時柱の一括計算 */
+function tenmeiCalculateFourPillars(birthdate, birthtime) {
+  const date = tenmeiParseBirthdate(birthdate);
+
+  const year = tenmeiCalculateYearPillarSafe(
+    birthdate,
+    birthtime
+  );
+
+  const month = tenmeiCalculateMonthPillar(
+    birthdate,
+    birthtime
+  );
+
+  const day = tenmeiCalculateDayPillar(birthdate);
+
+  const hour = tenmeiCalculateHourPillar(
+    birthdate,
+    birthtime
+  );
+
+  const warnings = [];
+
+  if (year.status !== "ok") {
+    warnings.push("年柱：" + year.reason);
+  }
+
+  if (month.status !== "ok") {
+    warnings.push("月柱：" + month.reason);
+  }
+
+  if (hour.status !== "ok") {
+    warnings.push("時柱：" + hour.reason);
+  }
+
+  return {
+    status: warnings.length === 0
+      ? "ok"
+      : "needsVerification",
+    birthdate: date,
+    birthtime: birthtime || null,
+    pillars: {
+      year: year,
+      month: month,
+      day: day,
+      hour: hour
+    },
+    warnings: warnings
+  };
+}
