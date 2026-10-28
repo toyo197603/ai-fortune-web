@@ -329,3 +329,69 @@ function tenmeiGetSetsuiri(year, month) {
     uncertaintyMs: 86400000
   };
 }
+
+/* 九星気学：立春を年の切り替えとする */
+function tenmeiCalculateNineStar(birthdate) {
+  const yearResult =
+    tenmeiCalculateYearPillarSafe(birthdate);
+
+  if (yearResult.status !== "ok") {
+    return yearResult;
+  }
+
+  const number =
+    tenmeiMod(10 - tenmeiMod(yearResult.year, 9), 9) + 1;
+
+  const names = [
+    "一白水星",
+    "二黒土星",
+    "三碧木星",
+    "四緑木星",
+    "五黄土星",
+    "六白金星",
+    "七赤金星",
+    "八白土星",
+    "九紫火星"
+  ];
+
+  return {
+    status: "ok",
+    year: yearResult.year,
+    number: number,
+    name: names[number - 1]
+  };
+}
+
+/* 数秘術：11・22・33はマスターナンバーとして保持 */
+function tenmeiCalculateLifePath(birthdate) {
+  const { year, month, day } =
+    tenmeiParseBirthdate(birthdate);
+
+  const digits =
+    String(year) +
+    String(month).padStart(2, "0") +
+    String(day).padStart(2, "0");
+
+  let number = [...digits].reduce(
+    (sum, digit) => sum + Number(digit),
+    0
+  );
+
+  while (
+    number > 9 &&
+    number !== 11 &&
+    number !== 22 &&
+    number !== 33
+  ) {
+    number = [...String(number)].reduce(
+      (sum, digit) => sum + Number(digit),
+      0
+    );
+  }
+
+  return {
+    status: "ok",
+    number: number,
+    method: "全桁合算・11/22/33保持"
+  };
+}
