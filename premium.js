@@ -335,7 +335,46 @@ function calculateMonthPillar(birthdate, birthtime = null) {
   }
 
   // 節入り前なら前の節月として扱う
-  const beforeSetsuiri = getExactSetsuiri(year, month) && birthtime ? compareBirthWithSetsuiri(birthdate, birthtime, year, month) === false : day < SHICHU_SETSUIRI[month - 1];
+  
+  const term = getExactSetsuiri(year, month);
+  let beforeSetsuiri;
+  let monthNeedsVerification = false;
+
+  if (!term || !Number.isFinite(Date.parse(term))) {
+    return {
+      monthPillar: null,
+      needsVerification: true
+    };
+  }
+
+  const termDay = new Date(
+    Date.parse(term) + 9 * 3600000
+  ).getUTCDate();
+
+  if (day < termDay) {
+    beforeSetsuiri = true;
+  } else if (day > termDay) {
+    beforeSetsuiri = false;
+  } else if (!birthtime) {
+    return {
+      monthPillar: null,
+      needsVerification: true
+    };
+  } else {
+    const after = compareBirthWithSetsuiri(
+      birthdate, birthtime, year, month
+    );
+
+    if (after === null) {
+      return {
+        monthPillar: null,
+        needsVerification: true
+      };
+    }
+
+    beforeSetsuiri = !after;
+  }
+
   const branchIndex = (month + 12 - (beforeSetsuiri ? 1 : 0)) % 12;
   // 年干を基準に寅月の天干を決定
   const yearPillar = calculateYearPillar(birthdate, birthtime);
@@ -350,8 +389,9 @@ function calculateMonthPillar(birthdate, birthtime = null) {
 
   return {
     monthPillar: SHICHU_STEMS[stemIndex] + SHICHU_BRANCHES[branchIndex],
-    needsVerification:
-      Math.abs(day - SHICHU_SETSUIRI[month - 1]) <= 2
+    
+needsVerification: monthNeedsVerification
+
   };
 }
 // 四柱推命：日柱の計算
