@@ -324,10 +324,12 @@ function tenmeiGetSetsuiri(year, month) {
     return null;
   }
 
-  return {
-    timestamp: timestamp,
-    uncertaintyMs: 86400000
-  };
+  
+return {
+  timestamp: timestamp,
+  uncertaintyMs: year === 2026 ? 60000 : 86400000
+};
+
 }
 
 /* 九星気学：立春を年の切り替えとする */
