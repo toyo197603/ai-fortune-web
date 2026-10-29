@@ -344,6 +344,39 @@ dataTestButton.style.cssText =
 
 dataTestButton.addEventListener("click", window.testFortuneData);
 document.body.appendChild(dataTestButton);
+async function runAIFortune() {
+  const output = document.getElementById("aiFortuneResult");
+  try {
+    output.hidden = false;
+    output.textContent = "AIが7占術を総合鑑定しています…";
+
+    const payload = window.buildFortuneRequest();
+    const response = await fetch(FORTUNE_API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || "HTTP " + response.status);
+    }
+
+    output.textContent = typeof data.fortune === "string"
+      ? data.fortune
+      : JSON.stringify(data, null, 2);
+  } catch (error) {
+    output.textContent = "AI鑑定エラー：" + error.message;
+  }
+}
+
+const aiFortuneButton = document.createElement("button");
+aiFortuneButton.type = "button";
+aiFortuneButton.textContent = "7占術をAIで総合鑑定する";
+aiFortuneButton.addEventListener("click", runAIFortune);
+document.body.appendChild(aiFortuneButton);
 </script>
 </body>
 </html>
