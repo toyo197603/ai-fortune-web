@@ -247,7 +247,7 @@ const FORTUNE_API =
 
 async function checkFortuneAPI() {
   try {
-    const response = await fetch(FORTUNE_API);
+    const response = await fetch(FORTUNE_API
     const data = await response.json();
     alert(
       response.ok && data.status === "ok"
@@ -351,7 +351,7 @@ async function runAIFortune() {
     output.textContent = "AIが7占術を総合鑑定しています…";
 
     const payload = window.buildFortuneRequest();
-    const response = await fetch(FORTUNE_API, {
+    const response = await fetch(FORTUNE_API.replace("/health", "/fortune"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
