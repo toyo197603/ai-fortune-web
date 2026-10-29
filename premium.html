@@ -351,7 +351,7 @@ async function runAIFortune() {
     output.textContent = "AIが7占術を総合鑑定しています…";
 
     const payload = window.buildFortuneRequest();
-    const response = await fetch(FORTUNE_API.replace("/health", "/fortune"), {
+    const response = await fetch("https://ai-fortune-api.karen-nayuta-kanata.workers.dev/fortune", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
