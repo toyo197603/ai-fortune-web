@@ -162,16 +162,17 @@ body {
   <h2 id="premiumTitle" style="color:#eac783;">✦ 本格運命鑑定 ✦</h2>
   <p id="premiumLead" style="color:white;text-align:left!important;display:block;width:100%;">
   <p style="color:#ddd;line-height:1.8;text-align:left;">
-    3か月・半年・1年の運勢と、
-    あなたに合わせた具体的な開運アドバイスをお届けします。
+    七つの占術を照らし合わせ、相談内容に沿った総合鑑定と、
+    今日からできる具体的な行動のヒントをお届けします。
   </p>
   <h2 style="color:#eac783;">980円（税込）</h2>
-  <button type="button" disabled>本格鑑定へ進む（準備中）</button>
+  <button type="button" id="openPremium">特別鑑定へ進む</button>
   <p style="font-size:12px;color:#ccc;">買い切り・月額料金なし</p>
 </div>
 
 </main>
 <script>
+document.getElementById("openPremium").addEventListener("click",()=>{location.assign(new URL("./premium.html",location.href).href);});
 const API="https://ai-fortune-api.karen-nayuta-kanata.workers.dev/fortune";
 document.getElementById("form").addEventListener("submit",async e=>{
 e.preventDefault();
@@ -335,3 +336,4 @@ overlay.style.display="none";
 </script>
 </body>
 </html>
+
