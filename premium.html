@@ -33,6 +33,7 @@ button{border:0;cursor:pointer;font-size:15px}
 textarea{width:100%;min-height:140px;padding:13px;border:1px solid #9c865a;border-radius:10px;background:#191d38;color:#fff5dc;font:inherit;font-size:16px}button:disabled{opacity:.55;cursor:wait}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #f5d998;outline-offset:3px}.fortune{white-space:pre-wrap;overflow-wrap:anywhere;line-height:2}.actions{display:flex;gap:12px;flex-wrap:wrap}.secondary{padding:12px 18px;background:#28233f;border:1px solid #aa925d;border-radius:9px;color:#f7e4b5}[hidden]{display:none!important}.status{white-space:pre-line}.reading p{overflow-wrap:anywhere}</style>
 </head><body><main class="wrap">
 <header class="top"><div class="eyebrow">PREMIUM READING</div><h1>天命の導き</h1><p class="lead">七つの占術を照らし合わせ、あなたのための総合鑑定を</p></header>
+<section class="panel" id="recoveryPanel"><h2>購入済みの鑑定</h2><p class="note">このブラウザで購入した鑑定を再表示できます。別の端末では、保存した再表示リンクを使用してください。</p><div id="purchaseHistory" class="actions"></div><label for="recoveryLink">保存した再表示リンク</label><input id="recoveryLink" type="text" autocomplete="off" placeholder="再表示リンクを貼り付け"><button type="button" class="secondary" id="restoreReading">購入済み鑑定を開く</button></section>
 <section class="panel" id="inputPanel"><h2>あなたのことを教えてください</h2>
 <form id="form">
 <label for="birth">生年月日</label><input id="birth" type="date" min="1920-01-01" max="2030-12-31" required>
@@ -50,8 +51,8 @@ textarea{width:100%;min-height:140px;padding:13px;border:1px solid #9c865a;borde
 <button type="button" id="retry" class="primary" hidden>購入済みの鑑定を再表示する</button>
 <section id="result" hidden><article class="panel"><div class="eyebrow">YOUR READING</div><h2>あなたへの総合鑑定</h2><div id="fortune" class="fortune"></div></article>
 <details class="panel"><summary>鑑定に用いた7占術の結果</summary><div id="cards"></div></details>
-<div class="actions"><button type="button" class="secondary" id="save">鑑定文を保存する</button><button type="button" class="secondary" id="newReading">別の相談を鑑定する</button></div>
-<p class="note">購入済み鑑定はこのタブから再表示できます。鑑定文を保存しておくことをおすすめします。</p></section>
+<div class="actions"><button type="button" class="secondary" id="copyRecovery">再表示リンクをコピー</button><button type="button" class="secondary" id="save">鑑定文を保存する</button><button type="button" class="secondary" id="newReading">別の相談を鑑定する</button></div>
+<p class="note">購入履歴はこのブラウザに保存されます。ブラウザのデータ削除に備えて、鑑定文と再表示リンクを保存してください。リンクを知る人は鑑定を閲覧できるため、大切に保管してください。</p></section>
 <footer class="footer">天命の導き · 特別鑑定</footer>
 </main><script type="module">
 /* 天命の導き｜有料鑑定エンジン */
@@ -902,9 +903,50 @@ function buildReadings(input, engine) {
 const API='https://ai-fortune-api.karen-nayuta-kanata.workers.dev';
 const $=id=>document.getElementById(id);
 let theme='恋愛',card=null,busy=false,purchaseSession=null,requestId=null,lastPayload=null,fortuneText='';
-function store(key,value){try{value===null?sessionStorage.removeItem(key):sessionStorage.setItem(key,value);}catch{}}
-function load(key){try{return sessionStorage.getItem(key);}catch{return null;}}
-function setBusy(value){busy=value;document.querySelectorAll('#form input,#form textarea,#form button,#previewPanel input,#previewPanel button,#retry,#newReading').forEach(el=>el.disabled=value);}
+function store(key,value){
+  let saved=false;
+  for(const storage of ['localStorage','sessionStorage']){
+    try{value===null?window[storage].removeItem(key):window[storage].setItem(key,value);saved=true;}catch{}
+  }
+  return saved;
+}
+function load(key){
+  for(const storage of ['localStorage','sessionStorage']){
+    try{const value=window[storage].getItem(key);if(value!==null)return value;}catch{}
+  }
+  return null;
+}
+function validSession(value){return typeof value==='string'&&/^cs_(?:test_|live_)?[A-Za-z0-9]{8,240}$/.test(value);}
+function historyItems(){
+  try{const rows=JSON.parse(load('tenmeiHistory')||'[]');return Array.isArray(rows)?rows.filter(x=>x&&validSession(x.id)).slice(0,50):[];}catch{return [];}
+}
+function rememberSession(id){
+  if(!validSession(id))return;
+  const rows=historyItems(),existing=rows.find(x=>x.id===id);
+  store('tenmeiHistory',JSON.stringify([existing||{id,date:new Date().toISOString()},...rows.filter(x=>x.id!==id)].slice(0,50)));
+  renderHistory();
+}
+function renderHistory(){
+  const target=$('purchaseHistory');target.replaceChildren();
+  for(const row of historyItems()){
+    const button=document.createElement('button');button.type='button';button.className='secondary';
+    const date=new Date(row.date);
+    button.textContent=(Number.isNaN(date.getTime())?'保存済み':date.toLocaleString('ja-JP'))+'の鑑定';
+    button.addEventListener('click',()=>{if(busy)return;purchaseSession=row.id;store('tenmeiSession',row.id);receive();});
+    target.append(button);
+  }
+}
+function recoveryURL(){
+  if(!validSession(purchaseSession))return null;
+  const url=new URL(location.href);url.search='';url.hash=new URLSearchParams({reading:purchaseSession}).toString();return url.href;
+}
+function sessionFromLink(value){
+  const url=new URL(value);
+  if(url.origin!==location.origin||url.pathname!==location.pathname)throw Error('天命の導きの再表示リンクを貼り付けてください');
+  const id=new URLSearchParams(url.hash.slice(1)).get('reading')||url.searchParams.get('session_id');
+  if(!validSession(id))throw Error('再表示リンクを確認してください');return id;
+}
+function setBusy(value){busy=value;document.querySelectorAll('#form input,#form textarea,#form button,#previewPanel input,#previewPanel button,#retry,#newReading,#restoreReading,#copyRecovery,#purchaseHistory button').forEach(el=>el.disabled=value);}
 function input(){return validateInput({birthday:$('birth').value,birthtime:$('birthtime').value,theme,question:$('question').value,tarot:card});}
 async function post(path,payload,token){
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),85000);
@@ -917,6 +959,8 @@ async function post(path,payload,token){
 }
 function show(data){
   if(typeof data.fortune!=='string'||!Array.isArray(data.readings)||data.readings.length!==7)throw Error('鑑定結果を取得できませんでした');
+  if(!data.preview&&purchaseSession)rememberSession(purchaseSession);
+  $('copyRecovery').hidden=!!data.preview;
   fortuneText=data.fortune;$('fortune').textContent=fortuneText;$('cards').replaceChildren();
   for(const row of data.readings){const article=document.createElement('article');article.className='reading';for(const [tag,text] of [['h3',row.system],['p',row.result],...(row.limitations||[]).map(x=>['p',x])]){const el=document.createElement(tag);el.textContent=text;article.append(el);}$('cards').append(article);}
   $('result').hidden=false;$('inputPanel').hidden=true;$('previewPanel').hidden=true;$('retry').hidden=true;
@@ -948,13 +992,18 @@ $('preview').addEventListener('click',async()=>{
   if(busy)return;$('error').textContent='';try{const data=input(),token=$('previewToken').value;if(!token)throw Error('開発用トークンを入力してください');setBusy(true);$('status').textContent='7占術から総合鑑定を作成しています…';const result=await post('/preview',data,token);$('previewToken').value='';show(result);}catch(e){$('error').textContent=e.message;$('status').textContent='';}finally{setBusy(false);}
 });
 $('retry').addEventListener('click',receive);
-$('save').addEventListener('click',()=>{const blob=new Blob(['天命の導き｜特別鑑定\n\n'+fortuneText],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='tenmei-fortune.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+$('restoreReading').addEventListener('click',()=>{if(busy)return;try{purchaseSession=sessionFromLink($('recoveryLink').value.trim());store('tenmeiSession',purchaseSession);$('recoveryLink').value='';receive();}catch(e){$('error').textContent=e.message;}});
+$('copyRecovery').addEventListener('click',async()=>{const url=recoveryURL();if(!url)return;try{await navigator.clipboard.writeText(url);$('status').textContent='再表示リンクをコピーしました。メモなどに保存してください。';}catch{$('recoveryLink').value=url;$('recoveryLink').focus();$('recoveryLink').select();$('status').textContent='上の再表示リンク欄を長押ししてコピーしてください。';}});
+renderHistory();
+$('save').addEventListener('click',()=>{const blob=new Blob(['天命の導き｜特別鑑定\n\n'+fortuneText+(recoveryURL()?'\n\n【購入済み鑑定の再表示リンク】\n'+recoveryURL():'')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='tenmei-fortune.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 $('newReading').addEventListener('click',()=>{store('tenmeiSession',null);store('tenmeiDraft',null);purchaseSession=null;requestId=null;lastPayload=null;card=null;fortuneText='';$('tarotResult').textContent='';$('result').hidden=true;$('inputPanel').hidden=false;$('question').value='';$('status').textContent='';$('error').textContent='';});
 const params=new URLSearchParams(location.search);
 $('previewPanel').hidden=params.get('preview')!=='1';
 try{const draft=JSON.parse(load('tenmeiDraft'));if(draft?.data){const data=validateInput(draft.data);$('birth').value=data.birthday;$('birthtime').value=data.birthtime;$('question').value=data.question;theme=data.theme;card=data.tarot;requestId=draft.requestId;lastPayload=JSON.stringify(data);$('tarotResult').textContent=TAROT[card.index]+' · '+(card.reversed?'逆位置':'正位置');document.querySelectorAll('#tabs button').forEach(x=>{x.classList.toggle('on',x.dataset.theme===theme);x.setAttribute('aria-pressed',String(x.dataset.theme===theme));});}}catch{}
-const returned=params.get('session_id');
-if(returned){purchaseSession=returned;store('tenmeiSession',returned);const clean=new URL(location.href);clean.searchParams.delete('session_id');history.replaceState(null,'',clean);}
-else purchaseSession=load('tenmeiSession');
+const hashParams=new URLSearchParams(location.hash.slice(1));
+const returned=hashParams.get('reading')||params.get('session_id');
+if(validSession(returned)){purchaseSession=returned;store('tenmeiSession',returned);const clean=new URL(location.href);clean.searchParams.delete('session_id');if(hashParams.has('reading'))clean.hash='';history.replaceState(null,'',clean);}
+else {const saved=load('tenmeiSession');purchaseSession=validSession(saved)?saved:null;if(purchaseSession)store('tenmeiSession',purchaseSession);}
 if(purchaseSession)receive();else if(params.has('cancelled'))$('status').textContent='お支払いはキャンセルされました。入力内容を確認して続けられます。';
 </script></body></html>
+
